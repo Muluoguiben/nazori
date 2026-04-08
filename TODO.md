@@ -1,8 +1,21 @@
 # Nazori TODO
 
+## Done
+
+- [x] Project scaffolding (Vite + React + TypeScript + Manifest V3)
+- [x] Shared modules (types, constants, language detection, messaging, storage)
+- [x] Worker backend (Hono + Claude API + auth + rate limiting + CORS)
+- [x] Background Service Worker (translation, term CRUD, LRU cache)
+- [x] Content Script + Bubble UI (Shadow DOM, streaming, smart positioning)
+- [x] Popup + Options pages (term management, history, settings)
+- [x] Preset terms (75 terms: legal/medical/tech) + i18n (en/zh_CN/et)
+- [x] Unit tests (90 passing: extension 70 + worker 20)
+- [x] CI/CD (GitHub Actions: ci, release-extension, release-worker)
+- [x] Refactor worker to LangGraph framework (StateGraph: detect → match → prompt → translate)
+
 ## Deploy & Verify
 
-- [ ] Deploy Worker backend (`cd worker && npx wrangler deploy`)
+- [ ] Deploy Worker backend (`cd worker && npx wrangler login && npx wrangler deploy`)
 - [ ] Set Claude API key (`npx wrangler secret put CLAUDE_API_KEY`)
 - [ ] Update `API_BASE_URL` in `extension/src/shared/constants.ts` with real Worker URL
 - [ ] Rebuild extension (`cd extension && npm run build`)
@@ -26,10 +39,11 @@
 
 ## v2 - Advanced Features
 
-- [ ] Back-translation review (translate -> back-translate -> compare)
+- [ ] Add LangGraph nodes for back-translation review (translate → back-translate → compare)
+- [ ] Add quality assessment node to LangGraph (confidence scoring)
 - [ ] Full page translation mode
 - [ ] PDF viewer text selection support
-- [ ] Multi-model support (Claude / GPT / DeepL)
+- [ ] Multi-model support (Claude / GPT / DeepL) — LangGraph makes this easy to swap
 - [ ] Auto-discover terminology from translation context
 - [ ] Team collaboration: cloud-synced shared glossaries
 
