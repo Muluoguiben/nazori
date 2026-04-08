@@ -123,6 +123,18 @@ function init() {
       closeBubble();
     }
   });
+
+  // Listen for messages from the background (e.g. context menu translation)
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === 'TRANSLATE_REQUEST' && message.payload?.text) {
+      // Build a synthetic selection rect centered in the viewport
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 3;
+      const rect = new DOMRect(centerX - 50, centerY, 100, 0);
+
+      showBubble({ text: message.payload.text, rect });
+    }
+  });
 }
 
 // Self-initialize when the content script loads

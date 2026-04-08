@@ -37,7 +37,7 @@ jobs:
           cache-dependency-path: extension/package-lock.json
       - run: npm ci
         working-directory: extension
-      - run: npm test
+      - run: npm run test:coverage
         working-directory: extension
 
   test-worker:
@@ -51,7 +51,7 @@ jobs:
           cache-dependency-path: worker/package-lock.json
       - run: npm ci
         working-directory: worker
-      - run: npm test
+      - run: npm run test:coverage
         working-directory: worker
 
   build:

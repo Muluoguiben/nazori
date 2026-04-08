@@ -13,6 +13,18 @@
 - [x] CI/CD (GitHub Actions: ci, release-extension, release-worker)
 - [x] Refactor worker to LangGraph framework (StateGraph: detect → match → prompt → translate)
 - [x] Multi-model: Gemini 2.0 Flash (primary, free) + Workers AI Llama 3.3 70B (fallback, free)
+- [x] Design and replace placeholder icons (indigo "N" at 16/48/128px via `scripts/generate-icons.js`)
+- [x] Dark mode across all pages (Popup, Options, Bubble — system + manual toggle)
+- [x] Right-click context menu translation (background sends to content script handler)
+- [x] Keyboard shortcut handler (Alt+T toggles extension on/off)
+- [x] LRU cache size tuned (100 entries, ~100 KB, documented in constants.ts)
+- [x] Translation history search and re-view in Options (already implemented)
+- [x] CSV/JSON import-export for terminology (already implemented)
+- [x] Bubble position edge cases (viewport bounds, flip above/below, horizontal clamp)
+- [x] Error UX polish (offline detection, timeout, rate limit, retry button)
+- [x] Test coverage > 80% threshold enforcement in CI (vitest coverage-v8)
+- [x] `CONTRIBUTING.md` and development onboarding guide
+- [x] `CLAUDE.md` codebase guide for AI assistants
 
 ## Deploy & Verify
 
@@ -29,15 +41,10 @@
 
 ## v1.1 - Experience Polish
 
-- [ ] Design and replace placeholder icons (current 1x1 PNG)
-- [ ] Verify dark mode across all pages (Popup, Options, Bubble)
-- [ ] End-to-end test right-click context menu translation
-- [ ] Tune LRU cache size based on real usage
-- [ ] Add keyboard shortcut customization UI
-- [ ] Translation history search and re-view in Options
-- [ ] CSV import/export testing with real terminology files
-- [ ] Bubble position edge cases (iframe, very long pages, narrow viewports)
-- [ ] Error UX polish (offline, rate limit countdown, retry)
+- [ ] Add keyboard shortcut customization UI (currently only Alt+T, no UI to remap)
+- [ ] Font size setting wired to bubble UI (small/medium/large from Settings)
+- [ ] Double-click and hotkey trigger modes in SelectionHandler
+- [ ] Term highlighting in bubble translation text (showTermHighlight setting)
 
 ## v2 - Advanced Features
 
@@ -52,7 +59,5 @@
 ## Engineering
 
 - [ ] E2E tests with Playwright (Chrome extension testing)
-- [ ] Test coverage > 80% threshold enforcement in CI
 - [ ] Chrome Web Store submission (prepare listing assets, privacy policy)
 - [ ] Set up Cloudflare analytics monitoring for Worker
-- [ ] Add `CONTRIBUTING.md` and development onboarding guide

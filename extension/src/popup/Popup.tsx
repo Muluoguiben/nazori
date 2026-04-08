@@ -14,6 +14,16 @@ function Popup() {
     loadData();
   }, []);
 
+  // Apply theme class to the document body
+  useEffect(() => {
+    document.body.classList.remove('theme-light', 'theme-dark');
+    if (settings.theme === 'light') {
+      document.body.classList.add('theme-light');
+    } else if (settings.theme === 'dark') {
+      document.body.classList.add('theme-dark');
+    }
+  }, [settings.theme]);
+
   async function loadData() {
     try {
       const result = await chrome.storage.local.get([

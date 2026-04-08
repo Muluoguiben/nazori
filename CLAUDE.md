@@ -28,8 +28,10 @@ nazori/
 │   │   ├── routes/     # Translation endpoints (SSE streaming + full)
 │   │   └── types.ts
 │   └── tests/          # Vitest unit tests
+├── scripts/            # Build utilities (icon generation)
 ├── .github/workflows/  # CI, release-extension, deploy-worker
 ├── SPEC.md             # Full project specification
+├── CONTRIBUTING.md     # Development setup and onboarding guide
 └── TODO.md             # Development roadmap
 ```
 
@@ -45,6 +47,7 @@ npm run dev             # Dev mode with watch rebuild
 npm run build           # Type-check + production build (outputs to dist/)
 npm test                # Run unit tests (vitest run)
 npm run test:watch      # Run tests in watch mode
+npm run test:coverage   # Run tests with 80% coverage threshold
 npm run lint            # ESLint (src --ext .ts,.tsx)
 npm run format          # Prettier write (src/**/*.{ts,tsx,css})
 ```
@@ -57,6 +60,7 @@ npm run dev             # Local dev server (wrangler dev)
 npm run deploy          # Deploy to Cloudflare Workers
 npm test                # Run unit tests (vitest run)
 npm run test:watch      # Run tests in watch mode
+npm run test:coverage   # Run tests with 80% coverage threshold
 npm run lint            # ESLint (src --ext .ts)
 npm run format          # Prettier write (src/**/*.ts)
 ```
@@ -66,8 +70,8 @@ npm run format          # Prettier write (src/**/*.ts)
 GitHub Actions runs on push to `main` and all PRs:
 
 1. **lint-and-typecheck** — `tsc --noEmit` for both extension and worker
-2. **test-extension** — `npm test` in extension/
-3. **test-worker** — `npm test` in worker/
+2. **test-extension** — `npm run test:coverage` in extension/ (80% threshold)
+3. **test-worker** — `npm run test:coverage` in worker/ (80% threshold)
 4. **build** — Production build of extension (depends on lint)
 
 Always run `tsc --noEmit` and `npm test` in both directories before pushing.
