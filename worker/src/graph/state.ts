@@ -11,7 +11,10 @@ export const TranslationState = Annotation.Root({
   targetLang: Annotation<string>,
   domain: Annotation<'general' | 'legal' | 'medical' | 'tech'>,
   inputTerms: Annotation<{ source: string; target: string }[]>,
-  apiKey: Annotation<string>,
+
+  // ── Model config ───────────────────────────────────────────────────
+  geminiApiKey: Annotation<string>,
+  ai: Annotation<Ai | null>, // Cloudflare Workers AI binding (fallback)
 
   // ── Intermediate ───────────────────────────────────────────────────
   detectedLang: Annotation<string>,
@@ -20,6 +23,7 @@ export const TranslationState = Annotation.Root({
 
   // ── Output ─────────────────────────────────────────────────────────
   translatedText: Annotation<string>,
+  modelUsed: Annotation<string>, // which model actually served the request
   usage: Annotation<{ inputTokens: number; outputTokens: number }>,
   error: Annotation<string | undefined>,
 });

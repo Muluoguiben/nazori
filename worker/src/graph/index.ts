@@ -13,7 +13,7 @@ import {
  * Graph topology:
  *   detectLanguage → matchTerms → buildPrompt → translate → END
  *
- * Each node enriches the shared TranslationState and passes it downstream.
+ * Model priority: Gemini 2.0 Flash (free) → Workers AI Llama 3.3 70B (free fallback)
  */
 export function buildTranslationGraph() {
   const graph = new StateGraph(TranslationState)
@@ -36,5 +36,5 @@ export {
   matchTermsNode,
   buildPromptNode,
   translateNode,
-  createStreamingTranslateNode,
+  createGeminiStreamingModel,
 } from './nodes';

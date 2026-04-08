@@ -1,5 +1,4 @@
 import { Context } from 'hono';
-import { ChatAnthropic } from '@langchain/anthropic';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { AppEnv, TranslateRequestBody } from '../types';
 import {
@@ -7,6 +6,7 @@ import {
   detectLanguageNode,
   matchTermsNode,
   buildPromptNode,
+  createGeminiStreamingModel,
 } from '../graph';
 
 const MAX_TEXT_LENGTH = 5000;
@@ -84,10 +84,10 @@ function validateBody(body: unknown): { valid: true; data: TranslateRequestBody 
 }
 
 /**
- * Streaming translate handler using LangGraph.
+ * Streaming translate handler.
  *
- * Runs the graph nodes (detectLanguage → matchTerms → buildPrompt) to prepare
- * the prompt, then streams the Claude response token-by-token via SSE.
+ * Runs graph nodes (detectLanguage → matchTerms → buildPrompt) to prepare
+ * the prompt, then streams via Gemini (primary) or Workers AI (fallback).
  */
 export async function translateHandler(c: Context<AppEnv>) {
   let body: unknown;
@@ -103,25 +103,25 @@ export async function translateHandler(c: Context<AppEnv>) {
   }
 
   const { data } = result;
-  const apiKey = c.env.CLAUDE_API_KEY;
 
-  // Run the pre-translation graph nodes to build the prompt
+  // Run pre-translation graph nodes
   const initialState = {
     text: data.text,
     sourceLang: data.source_lang,
     targetLang: data.target_lang,
     domain: data.domain,
     inputTerms: data.terms,
-    apiKey,
+    geminiApiKey: c.env.GEMINI_API_KEY || '',
+    ai: null,
     detectedLang: '',
     matchedTerms: [] as { source: string; target: string }[],
     systemPrompt: '',
     translatedText: '',
+    modelUsed: '',
     usage: { inputTokens: 0, outputTokens: 0 },
     error: undefined,
   };
 
-  // Execute detect → match → buildPrompt nodes sequentially
   const afterDetect = await detectLanguageNode(initialState);
   const stateAfterDetect = { ...initialState, ...afterDetect };
 
@@ -131,56 +131,89 @@ export async function translateHandler(c: Context<AppEnv>) {
   const afterPrompt = await buildPromptNode(stateAfterMatch);
   const preparedState = { ...stateAfterMatch, ...afterPrompt };
 
-  // Stream the translation using LangChain's ChatAnthropic
-  const model = new ChatAnthropic({
-    model: 'claude-sonnet-4-6',
-    maxTokens: 4096,
-    anthropicApiKey: apiKey,
-    streaming: true,
-  });
-
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
-      const emit = (data: object) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+      const emit = (d: object) => {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(d)}\n\n`));
       };
 
-      try {
-        const langchainStream = await model.stream([
-          new SystemMessage(preparedState.systemPrompt),
-          new HumanMessage(preparedState.text),
-        ]);
+      let modelUsed = 'none';
 
-        let fullText = '';
+      // ── Try Gemini streaming ──────────────────────────────────────
+      if (c.env.GEMINI_API_KEY) {
+        try {
+          const model = createGeminiStreamingModel(c.env.GEMINI_API_KEY);
+          const langchainStream = await model.stream([
+            new SystemMessage(preparedState.systemPrompt),
+            new HumanMessage(preparedState.text),
+          ]);
 
-        for await (const chunk of langchainStream) {
-          const text =
-            typeof chunk.content === 'string'
-              ? chunk.content
-              : chunk.content
-                  .filter((c) => c.type === 'text')
-                  .map((c) => ('text' in c ? c.text : ''))
-                  .join('');
+          modelUsed = 'gemini-2.0-flash';
 
-          if (text) {
-            fullText += text;
-            emit({ type: 'text_delta', text });
+          for await (const chunk of langchainStream) {
+            const text =
+              typeof chunk.content === 'string'
+                ? chunk.content
+                : chunk.content
+                    .filter((block) => block.type === 'text')
+                    .map((block) => ('text' in block ? block.text : ''))
+                    .join('');
+            if (text) {
+              emit({ type: 'text_delta', text });
+            }
           }
+
+          emit({
+            type: 'message_stop',
+            modelUsed,
+            detectedLang: preparedState.detectedLang,
+            matchedTerms: preparedState.matchedTerms,
+          });
+          controller.close();
+          return;
+        } catch (err: unknown) {
+          console.warn('Gemini streaming failed, trying Workers AI fallback:', err instanceof Error ? err.message : err);
         }
-
-        emit({
-          type: 'message_stop',
-          detectedLang: preparedState.detectedLang,
-          matchedTerms: preparedState.matchedTerms,
-        });
-
-        controller.close();
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Translation failed';
-        emit({ type: 'error', error: message });
-        controller.close();
       }
+
+      // ── Fallback: Workers AI (non-streaming) ──────────────────────
+      if (c.env.AI) {
+        try {
+          const response = await c.env.AI.run(
+            '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+            {
+              messages: [
+                { role: 'system', content: preparedState.systemPrompt },
+                { role: 'user', content: preparedState.text },
+              ],
+              max_tokens: 4096,
+            },
+          );
+
+          modelUsed = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+          const translatedText = (response as { response: string }).response || '';
+
+          // Emit full result as a single chunk
+          emit({ type: 'text_delta', text: translatedText });
+          emit({
+            type: 'message_stop',
+            modelUsed,
+            detectedLang: preparedState.detectedLang,
+            matchedTerms: preparedState.matchedTerms,
+          });
+          controller.close();
+          return;
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : 'Workers AI failed';
+          emit({ type: 'error', error: message });
+          controller.close();
+          return;
+        }
+      }
+
+      emit({ type: 'error', error: 'No model available. Set GEMINI_API_KEY or enable Workers AI.' });
+      controller.close();
     },
   });
 
@@ -196,7 +229,6 @@ export async function translateHandler(c: Context<AppEnv>) {
 
 /**
  * Non-streaming translate handler — runs the full LangGraph end-to-end.
- * Useful for batch/API consumers that don't need SSE.
  */
 export async function translateFullHandler(c: Context<AppEnv>) {
   let body: unknown;
@@ -221,11 +253,13 @@ export async function translateFullHandler(c: Context<AppEnv>) {
     targetLang: data.target_lang,
     domain: data.domain,
     inputTerms: data.terms,
-    apiKey: c.env.CLAUDE_API_KEY,
+    geminiApiKey: c.env.GEMINI_API_KEY || '',
+    ai: c.env.AI || null,
     detectedLang: '',
     matchedTerms: [],
     systemPrompt: '',
     translatedText: '',
+    modelUsed: '',
     usage: { inputTokens: 0, outputTokens: 0 },
     error: undefined,
   });
@@ -238,6 +272,7 @@ export async function translateFullHandler(c: Context<AppEnv>) {
     translatedText: finalState.translatedText,
     detectedLang: finalState.detectedLang,
     matchedTerms: finalState.matchedTerms,
+    modelUsed: finalState.modelUsed,
     usage: finalState.usage,
   });
 }

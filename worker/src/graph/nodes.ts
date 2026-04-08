@@ -1,4 +1,4 @@
-import { ChatAnthropic } from '@langchain/anthropic';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { TranslationStateType } from './state';
 
@@ -45,14 +45,12 @@ export async function detectLanguageNode(
 
   const text = state.text;
 
-  // Check Unicode ranges first
   for (const [pattern, lang] of LANG_PATTERNS) {
     if (pattern.test(text)) {
       return { detectedLang: lang };
     }
   }
 
-  // Check word patterns for Latin-script languages
   for (const [pattern, lang] of WORD_PATTERNS) {
     if (pattern.test(text)) {
       return { detectedLang: lang };
@@ -108,61 +106,115 @@ export async function buildPromptNode(
   return { systemPrompt: system };
 }
 
-// ── Node: Translate (Claude API via LangChain) ────────────────────────
+// ── Node: Translate (Gemini primary → Workers AI fallback) ────────────
 
 export async function translateNode(
   state: TranslationStateType,
 ): Promise<Partial<TranslationStateType>> {
-  const { text, systemPrompt, apiKey } = state;
+  const { text, systemPrompt, geminiApiKey, ai } = state;
 
-  try {
-    const model = new ChatAnthropic({
-      model: 'claude-sonnet-4-6',
-      maxTokens: 4096,
-      anthropicApiKey: apiKey,
-    });
-
-    const response = await model.invoke([
-      new SystemMessage(systemPrompt),
-      new HumanMessage(text),
-    ]);
-
-    const translatedText =
-      typeof response.content === 'string'
-        ? response.content
-        : response.content
-            .filter((c) => c.type === 'text')
-            .map((c) => ('text' in c ? c.text : ''))
-            .join('');
-
-    const usage = response.usage_metadata
-      ? {
-          inputTokens: response.usage_metadata.input_tokens,
-          outputTokens: response.usage_metadata.output_tokens,
-        }
-      : { inputTokens: 0, outputTokens: 0 };
-
-    return { translatedText, usage, error: undefined };
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : 'Translation failed';
-    return {
-      translatedText: '',
-      usage: { inputTokens: 0, outputTokens: 0 },
-      error: message,
-    };
+  // Try Gemini first
+  if (geminiApiKey) {
+    try {
+      const result = await translateWithGemini(geminiApiKey, systemPrompt, text);
+      return { ...result, modelUsed: 'gemini-2.0-flash' };
+    } catch (err: unknown) {
+      console.warn('Gemini failed, falling back to Workers AI:', err instanceof Error ? err.message : err);
+    }
   }
+
+  // Fallback to Cloudflare Workers AI
+  if (ai) {
+    try {
+      const result = await translateWithWorkersAI(ai, systemPrompt, text);
+      return { ...result, modelUsed: '@cf/meta/llama-3.3-70b-instruct-fp8-fast' };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'All translation models failed';
+      return {
+        translatedText: '',
+        usage: { inputTokens: 0, outputTokens: 0 },
+        modelUsed: 'none',
+        error: message,
+      };
+    }
+  }
+
+  return {
+    translatedText: '',
+    usage: { inputTokens: 0, outputTokens: 0 },
+    modelUsed: 'none',
+    error: 'No model available. Set GEMINI_API_KEY or enable Workers AI binding.',
+  };
 }
 
-// ── Node: Translate with Streaming ────────────────────────────────────
+// ── Gemini via LangChain ──────────────────────────────────────────────
 
-export function createStreamingTranslateNode(apiKey: string) {
-  const model = new ChatAnthropic({
-    model: 'claude-sonnet-4-6',
-    maxTokens: 4096,
-    anthropicApiKey: apiKey,
-    streaming: true,
+async function translateWithGemini(
+  apiKey: string,
+  systemPrompt: string,
+  text: string,
+): Promise<{ translatedText: string; usage: { inputTokens: number; outputTokens: number }; error: undefined }> {
+  const model = new ChatGoogleGenerativeAI({
+    model: 'gemini-2.0-flash',
+    maxOutputTokens: 4096,
+    apiKey,
   });
 
-  return { model };
+  const response = await model.invoke([
+    new SystemMessage(systemPrompt),
+    new HumanMessage(text),
+  ]);
+
+  const translatedText =
+    typeof response.content === 'string'
+      ? response.content
+      : response.content
+          .filter((c) => c.type === 'text')
+          .map((c) => ('text' in c ? c.text : ''))
+          .join('');
+
+  const usage = response.usage_metadata
+    ? {
+        inputTokens: response.usage_metadata.input_tokens,
+        outputTokens: response.usage_metadata.output_tokens,
+      }
+    : { inputTokens: 0, outputTokens: 0 };
+
+  return { translatedText, usage, error: undefined };
+}
+
+// ── Cloudflare Workers AI (native binding) ────────────────────────────
+
+async function translateWithWorkersAI(
+  ai: Ai,
+  systemPrompt: string,
+  text: string,
+): Promise<{ translatedText: string; usage: { inputTokens: number; outputTokens: number }; error: undefined }> {
+  const response = await ai.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: text },
+    ],
+    max_tokens: 4096,
+  });
+
+  // Workers AI returns { response: string } for non-streaming
+  const translatedText = (response as { response: string }).response || '';
+
+  return {
+    translatedText,
+    usage: { inputTokens: 0, outputTokens: 0 }, // Workers AI doesn't report token usage
+    error: undefined,
+  };
+}
+
+// ── Exported helpers for streaming in route handler ───────────────────
+
+export function createGeminiStreamingModel(apiKey: string) {
+  return new ChatGoogleGenerativeAI({
+    model: 'gemini-2.0-flash',
+    maxOutputTokens: 4096,
+    apiKey,
+    streaming: true,
+  });
 }

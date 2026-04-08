@@ -12,8 +12,8 @@
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
-    "@langchain/anthropic": "^0.3.14",
     "@langchain/core": "^0.3.30",
+    "@langchain/google-genai": "^0.2.3",
     "@langchain/langgraph": "^0.2.42",
     "hono": "^4.6.14"
   },

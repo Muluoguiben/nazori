@@ -7,9 +7,11 @@ export interface TranslateRequestBody {
 }
 
 export interface Env {
-  CLAUDE_API_KEY: string;
+  GEMINI_API_KEY: string;
+  CLAUDE_API_KEY?: string; // optional, kept for future use
   ENVIRONMENT: string;
   RATE_LIMIT: KVNamespace;
+  AI: Ai; // Cloudflare Workers AI binding
 }
 
 export type AppVariables = {
