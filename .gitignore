@@ -8,6 +8,10 @@ dist/
 # Build output
 *.tsbuildinfo
 
+# Playwright
+test-results/
+playwright-report/
+
 # OS files
 .DS_Store
 Thumbs.db
