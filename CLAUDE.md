@@ -126,10 +126,20 @@ Always run `tsc --noEmit` and `npm test` in both directories before pushing.
 
 ## Testing
 
+### Unit Tests (Vitest)
 - **Framework**: Vitest 2.1.8 with global test functions (`describe`, `it`, `expect`)
 - **Extension tests** (`extension/tests/unit/`): cache, detectLanguage, terms
 - **Worker tests** (`worker/tests/`): translate endpoint and LangGraph pipeline
 - Tests use mocks for Chrome APIs and external services
+- Coverage threshold: 80% (lines/functions/branches/statements)
+
+### E2E Tests (Playwright)
+- **Framework**: Playwright with Chromium, runs headed via `xvfb-run`
+- **Location**: `extension/e2e/`
+- **Run**: `cd extension && npm run test:e2e` (builds then runs Playwright)
+- **27 tests** covering: popup UI, options page (tabs, terms, settings, history), content script (bubble show/close/disabled), shadow DOM isolation, extension lifecycle (storage init, service worker, settings sync)
+- Uses a local HTTP server to test content script injection on real pages
+- Content script is built as IIFE (two-pass Vite build) for broad Chrome compatibility
 
 ## Important Notes
 
@@ -137,4 +147,5 @@ Always run `tsc --noEmit` and `npm test` in both directories before pushing.
 - The `API_BASE_URL` in `extension/src/shared/constants.ts` must be updated with the actual Cloudflare Workers subdomain before deployment.
 - Gemini API key is set as a Cloudflare secret: `npx wrangler secret put GEMINI_API_KEY`
 - Extension outputs to `extension/dist/` — load as unpacked extension in Chrome for development.
+- The build uses a two-pass Vite process: first pass builds background/popup/options as ES modules, second pass (`BUILD_TARGET=content`) builds the content script as IIFE to avoid `import` statements that fail in some Chrome environments.
 - Node.js 20 is used in CI.

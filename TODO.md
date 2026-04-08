@@ -25,6 +25,8 @@
 - [x] Test coverage > 80% threshold enforcement in CI (vitest coverage-v8)
 - [x] `CONTRIBUTING.md` and development onboarding guide
 - [x] `CLAUDE.md` codebase guide for AI assistants
+- [x] E2E tests with Playwright (27 tests: popup, options, content script, lifecycle)
+- [x] Content script IIFE build (two-pass Vite build for cross-version Chrome compat)
 
 ## Deploy & Verify
 
@@ -58,6 +60,5 @@
 
 ## Engineering
 
-- [ ] E2E tests with Playwright (Chrome extension testing)
 - [ ] Chrome Web Store submission (prepare listing assets, privacy policy)
 - [ ] Set up Cloudflare analytics monitoring for Worker
