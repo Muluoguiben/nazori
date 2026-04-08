@@ -1,0 +1,439 @@
+/* ============================================================
+   Nazori Translation Bubble — Shadow DOM scoped styles
+   ============================================================ */
+
+/* --- Animations --- */
+@keyframes nazori-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nazori-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+/* --- Container --- */
+.nazori-bubble {
+  position: fixed;
+  box-sizing: border-box;
+  min-width: 280px;
+  max-width: 420px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #e2e4e8;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  animation: nazori-fade-in 0.18s ease-out;
+  z-index: 2147483647;
+  pointer-events: auto;
+  word-break: break-word;
+}
+
+.nazori-bubble *,
+.nazori-bubble *::before,
+.nazori-bubble *::after {
+  box-sizing: border-box;
+}
+
+/* --- Header --- */
+.nazori-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.nazori-source-text {
+  flex: 1;
+  font-size: 13px;
+  color: #555;
+  max-height: 3.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  cursor: default;
+}
+
+.nazori-close-btn {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #888;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nazori-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.nazori-close-btn:focus-visible {
+  outline: 2px solid #4a90d9;
+  outline-offset: 1px;
+}
+
+/* --- Separator --- */
+.nazori-separator {
+  height: 1px;
+  background: #e8e8e8;
+  margin: 0 0 10px;
+  border: none;
+}
+
+/* --- Controls --- */
+.nazori-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.nazori-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 4px 22px 4px 8px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background-color: #fafafa;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 10px 6px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.nazori-select:hover {
+  border-color: #999;
+}
+
+.nazori-select:focus-visible {
+  outline: 2px solid #4a90d9;
+  outline-offset: 1px;
+}
+
+.nazori-arrow-icon {
+  font-size: 12px;
+  color: #888;
+  align-self: center;
+}
+
+/* --- Translation area --- */
+.nazori-translation-area {
+  min-height: 40px;
+  margin-bottom: 10px;
+}
+
+.nazori-translation-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  white-space: pre-wrap;
+}
+
+.nazori-translation-text .nazori-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #4a90d9;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: nazori-cursor-blink 0.8s step-end infinite;
+}
+
+@keyframes nazori-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* --- Loading skeleton --- */
+.nazori-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nazori-skeleton-line {
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+  background-size: 800px 14px;
+  animation: nazori-shimmer 1.5s ease-in-out infinite;
+}
+
+.nazori-skeleton-line:nth-child(1) { width: 92%; }
+.nazori-skeleton-line:nth-child(2) { width: 78%; }
+.nazori-skeleton-line:nth-child(3) { width: 60%; }
+
+/* --- Copy button --- */
+.nazori-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  background: #fafafa;
+  color: #444;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.nazori-copy-btn:hover {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
+.nazori-copy-btn:focus-visible {
+  outline: 2px solid #4a90d9;
+  outline-offset: 1px;
+}
+
+.nazori-copy-btn--copied {
+  color: #2e7d32;
+  border-color: #a5d6a7;
+  background: #e8f5e9;
+}
+
+/* --- Footer (copy + terms toggle row) --- */
+.nazori-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* --- Matched terms --- */
+.nazori-terms-section {
+  margin-top: 8px;
+  border-top: 1px solid #e8e8e8;
+  padding-top: 8px;
+}
+
+.nazori-terms-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.nazori-terms-toggle:hover {
+  background: #f0f0f0;
+}
+
+.nazori-terms-toggle:focus-visible {
+  outline: 2px solid #4a90d9;
+  outline-offset: 1px;
+}
+
+.nazori-terms-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.nazori-term-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.nazori-term-source {
+  font-weight: 600;
+  color: #333;
+}
+
+.nazori-term-arrow {
+  color: #aaa;
+}
+
+.nazori-term-target {
+  color: #4a90d9;
+}
+
+/* --- Error state --- */
+.nazori-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+}
+
+.nazori-error-message {
+  font-size: 13px;
+  color: #b91c1c;
+}
+
+.nazori-retry-btn {
+  padding: 4px 12px;
+  border: 1px solid #f87171;
+  border-radius: 4px;
+  background: #fff;
+  color: #dc2626;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.nazori-retry-btn:hover {
+  background: #fef2f2;
+}
+
+.nazori-retry-btn:focus-visible {
+  outline: 2px solid #4a90d9;
+  outline-offset: 1px;
+}
+
+/* ============================================================
+   Dark mode
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  .nazori-bubble {
+    background: #1e1e1e;
+    border-color: #333;
+    color: #e0e0e0;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .nazori-source-text {
+    color: #aaa;
+  }
+
+  .nazori-close-btn {
+    color: #888;
+  }
+
+  .nazori-close-btn:hover {
+    background: #333;
+    color: #ddd;
+  }
+
+  .nazori-separator {
+    background: #333;
+  }
+
+  .nazori-select {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #ddd;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  }
+
+  .nazori-select:hover {
+    border-color: #666;
+  }
+
+  .nazori-translation-text {
+    color: #e0e0e0;
+  }
+
+  .nazori-skeleton-line {
+    background: linear-gradient(90deg, #2a2a2a 25%, #333 50%, #2a2a2a 75%);
+    background-size: 800px 14px;
+  }
+
+  .nazori-copy-btn {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #ccc;
+  }
+
+  .nazori-copy-btn:hover {
+    background: #333;
+    border-color: #666;
+  }
+
+  .nazori-copy-btn--copied {
+    color: #66bb6a;
+    border-color: #2e7d32;
+    background: #1b3d1e;
+  }
+
+  .nazori-terms-section {
+    border-top-color: #333;
+  }
+
+  .nazori-terms-toggle {
+    color: #999;
+  }
+
+  .nazori-terms-toggle:hover {
+    background: #333;
+  }
+
+  .nazori-term-item {
+    color: #aaa;
+  }
+
+  .nazori-term-source {
+    color: #ddd;
+  }
+
+  .nazori-term-target {
+    color: #64b5f6;
+  }
+
+  .nazori-error {
+    background: #2d1515;
+    border-color: #5c1a1a;
+  }
+
+  .nazori-error-message {
+    color: #f87171;
+  }
+
+  .nazori-retry-btn {
+    background: #2a2a2a;
+    border-color: #b91c1c;
+    color: #f87171;
+  }
+
+  .nazori-retry-btn:hover {
+    background: #3a1a1a;
+  }
+}

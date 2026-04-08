@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.wrangler/
+
+*.local
+.env*
+
+# Build output
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo

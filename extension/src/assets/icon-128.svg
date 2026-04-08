@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="20" fill="#4A90D9"/>
+  <path d="M16 38C16 24 32 14 64 14C96 14 112 24 112 38V70C112 86 96 98 80 98H72L56 116V98H48C32 98 16 86 16 70V38Z" fill="white" opacity="0.95"/>
+  <text x="64" y="74" font-family="sans-serif" font-size="52" font-weight="bold" fill="#4A90D9" text-anchor="middle" dominant-baseline="middle">な</text>
+</svg>

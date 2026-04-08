@@ -1,0 +1,70 @@
+{
+  "extName": {
+    "message": "Nazori - Tõlkeagent"
+  },
+  "extDescription": {
+    "message": "Professionaalne valdkonnapõhine tõlge terminoloogiahaldusega"
+  },
+  "popupTitle": {
+    "message": "Tõlke seaded"
+  },
+  "targetLang": {
+    "message": "Sihtkeel"
+  },
+  "domain": {
+    "message": "Valdkond"
+  },
+  "domainGeneral": {
+    "message": "Üldine"
+  },
+  "domainLegal": {
+    "message": "Õigus"
+  },
+  "domainMedical": {
+    "message": "Meditsiin"
+  },
+  "domainTech": {
+    "message": "Tehnoloogia"
+  },
+  "copySuccess": {
+    "message": "Kopeeritud!"
+  },
+  "retryButton": {
+    "message": "Proovi uuesti"
+  },
+  "errorRateLimit": {
+    "message": "Liiga palju päringuid, proovige uuesti $1 sekundi pärast",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorNetwork": {
+    "message": "Võrguühendus puudub"
+  },
+  "errorTimeout": {
+    "message": "Tõlke ajalõpp"
+  },
+  "errorServerUnavailable": {
+    "message": "Teenus ajutiselt kättesaamatu"
+  },
+  "errorTextTooLong": {
+    "message": "Tekst on liiga pikk (max 5000 tähemärki)"
+  },
+  "enabled": {
+    "message": "Lubatud"
+  },
+  "disabled": {
+    "message": "Keelatud"
+  },
+  "termsTab": {
+    "message": "Terminoloogia"
+  },
+  "historyTab": {
+    "message": "Ajalugu"
+  },
+  "settingsTab": {
+    "message": "Seaded"
+  }
+}

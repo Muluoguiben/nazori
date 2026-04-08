@@ -1,0 +1,70 @@
+{
+  "extName": {
+    "message": "Nazori - Translation Agent"
+  },
+  "extDescription": {
+    "message": "Professional domain-aware translation with terminology management"
+  },
+  "popupTitle": {
+    "message": "Translation Settings"
+  },
+  "targetLang": {
+    "message": "Target Language"
+  },
+  "domain": {
+    "message": "Domain"
+  },
+  "domainGeneral": {
+    "message": "General"
+  },
+  "domainLegal": {
+    "message": "Legal"
+  },
+  "domainMedical": {
+    "message": "Medical"
+  },
+  "domainTech": {
+    "message": "Tech"
+  },
+  "copySuccess": {
+    "message": "Copied!"
+  },
+  "retryButton": {
+    "message": "Retry"
+  },
+  "errorRateLimit": {
+    "message": "Too many requests, please try again in $1 seconds",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorNetwork": {
+    "message": "No network connection"
+  },
+  "errorTimeout": {
+    "message": "Translation timed out"
+  },
+  "errorServerUnavailable": {
+    "message": "Service temporarily unavailable"
+  },
+  "errorTextTooLong": {
+    "message": "Text too long (max 5000 characters)"
+  },
+  "enabled": {
+    "message": "Enabled"
+  },
+  "disabled": {
+    "message": "Disabled"
+  },
+  "termsTab": {
+    "message": "Terminology"
+  },
+  "historyTab": {
+    "message": "History"
+  },
+  "settingsTab": {
+    "message": "Settings"
+  }
+}

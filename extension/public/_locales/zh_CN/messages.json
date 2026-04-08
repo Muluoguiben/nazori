@@ -1,0 +1,70 @@
+{
+  "extName": {
+    "message": "Nazori - 翻译助手"
+  },
+  "extDescription": {
+    "message": "支持专业领域术语管理的智能翻译工具"
+  },
+  "popupTitle": {
+    "message": "翻译设置"
+  },
+  "targetLang": {
+    "message": "目标语言"
+  },
+  "domain": {
+    "message": "领域"
+  },
+  "domainGeneral": {
+    "message": "通用"
+  },
+  "domainLegal": {
+    "message": "法律"
+  },
+  "domainMedical": {
+    "message": "医学"
+  },
+  "domainTech": {
+    "message": "科技"
+  },
+  "copySuccess": {
+    "message": "已复制！"
+  },
+  "retryButton": {
+    "message": "重试"
+  },
+  "errorRateLimit": {
+    "message": "请求过于频繁，请在 $1 秒后重试",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorNetwork": {
+    "message": "无网络连接"
+  },
+  "errorTimeout": {
+    "message": "翻译超时"
+  },
+  "errorServerUnavailable": {
+    "message": "服务暂时不可用"
+  },
+  "errorTextTooLong": {
+    "message": "文本过长（最多5000字符）"
+  },
+  "enabled": {
+    "message": "已启用"
+  },
+  "disabled": {
+    "message": "已禁用"
+  },
+  "termsTab": {
+    "message": "术语库"
+  },
+  "historyTab": {
+    "message": "历史记录"
+  },
+  "settingsTab": {
+    "message": "设置"
+  }
+}
