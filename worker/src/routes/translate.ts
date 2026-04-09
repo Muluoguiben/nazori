@@ -138,82 +138,91 @@ export async function translateHandler(c: Context<AppEnv>) {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(d)}\n\n`));
       };
 
-      let modelUsed = 'none';
+      try {
+        let modelUsed = 'none';
 
-      // ── Try Gemini streaming ──────────────────────────────────────
-      if (c.env.GEMINI_API_KEY) {
-        try {
-          const model = createGeminiStreamingModel(c.env.GEMINI_API_KEY);
-          const langchainStream = await model.stream([
-            new SystemMessage(preparedState.systemPrompt),
-            new HumanMessage(preparedState.text),
-          ]);
+        // ── Try Gemini streaming ──────────────────────────────────────
+        if (c.env.GEMINI_API_KEY) {
+          try {
+            const model = createGeminiStreamingModel(c.env.GEMINI_API_KEY);
+            const langchainStream = await model.stream([
+              new SystemMessage(preparedState.systemPrompt),
+              new HumanMessage(preparedState.text),
+            ]);
 
-          modelUsed = 'gemini-2.0-flash';
+            modelUsed = 'gemini-2.0-flash';
 
-          for await (const chunk of langchainStream) {
-            const text =
-              typeof chunk.content === 'string'
-                ? chunk.content
-                : chunk.content
-                    .filter((block) => block.type === 'text')
-                    .map((block) => ('text' in block ? block.text : ''))
-                    .join('');
-            if (text) {
-              emit({ type: 'text_delta', text });
+            for await (const chunk of langchainStream) {
+              const text =
+                typeof chunk.content === 'string'
+                  ? chunk.content
+                  : chunk.content
+                      .filter((block) => block.type === 'text')
+                      .map((block) => ('text' in block ? block.text : ''))
+                      .join('');
+              if (text) {
+                emit({ type: 'text_delta', text });
+              }
             }
+
+            emit({
+              type: 'message_stop',
+              modelUsed,
+              detectedLang: preparedState.detectedLang,
+              matchedTerms: preparedState.matchedTerms,
+            });
+            controller.close();
+            return;
+          } catch (err: unknown) {
+            console.warn('Gemini streaming failed, trying Workers AI fallback:', err instanceof Error ? err.message : err);
           }
-
-          emit({
-            type: 'message_stop',
-            modelUsed,
-            detectedLang: preparedState.detectedLang,
-            matchedTerms: preparedState.matchedTerms,
-          });
-          controller.close();
-          return;
-        } catch (err: unknown) {
-          console.warn('Gemini streaming failed, trying Workers AI fallback:', err instanceof Error ? err.message : err);
         }
-      }
 
-      // ── Fallback: Workers AI (non-streaming) ──────────────────────
-      if (c.env.AI) {
+        // ── Fallback: Workers AI (non-streaming) ──────────────────────
+        if (c.env.AI) {
+          try {
+            const response = await c.env.AI.run(
+              '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+              {
+                messages: [
+                  { role: 'system', content: preparedState.systemPrompt },
+                  { role: 'user', content: preparedState.text },
+                ],
+                max_tokens: 4096,
+              },
+            );
+
+            modelUsed = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+            const translatedText = (response as { response: string }).response || '';
+
+            // Emit full result as a single chunk
+            emit({ type: 'text_delta', text: translatedText });
+            emit({
+              type: 'message_stop',
+              modelUsed,
+              detectedLang: preparedState.detectedLang,
+              matchedTerms: preparedState.matchedTerms,
+            });
+            controller.close();
+            return;
+          } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Workers AI failed';
+            emit({ type: 'error', error: message });
+            controller.close();
+            return;
+          }
+        }
+
+        emit({ type: 'error', error: 'No model available. Set GEMINI_API_KEY or enable Workers AI.' });
+        controller.close();
+      } catch (err: unknown) {
+        // Top-level safety net — ensures stream always closes with an error
+        const message = err instanceof Error ? err.message : 'Internal stream error';
         try {
-          const response = await c.env.AI.run(
-            '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
-            {
-              messages: [
-                { role: 'system', content: preparedState.systemPrompt },
-                { role: 'user', content: preparedState.text },
-              ],
-              max_tokens: 4096,
-            },
-          );
-
-          modelUsed = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
-          const translatedText = (response as { response: string }).response || '';
-
-          // Emit full result as a single chunk
-          emit({ type: 'text_delta', text: translatedText });
-          emit({
-            type: 'message_stop',
-            modelUsed,
-            detectedLang: preparedState.detectedLang,
-            matchedTerms: preparedState.matchedTerms,
-          });
-          controller.close();
-          return;
-        } catch (err: unknown) {
-          const message = err instanceof Error ? err.message : 'Workers AI failed';
-          emit({ type: 'error', error: message });
-          controller.close();
-          return;
-        }
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', error: message })}\n\n`));
+        } catch { /* controller may already be closed */ }
+        controller.close();
       }
-
-      emit({ type: 'error', error: 'No model available. Set GEMINI_API_KEY or enable Workers AI.' });
-      controller.close();
     },
   });
 
