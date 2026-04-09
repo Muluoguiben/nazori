@@ -1,6 +1,86 @@
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { TranslationStateType } from './state';
+
+const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_API_BASE = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}`;
+const GEMINI_TIMEOUT_MS = 20_000;
+
+type GeminiGenerateContentResponse = {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{ text?: string }>;
+    };
+  }>;
+  usageMetadata?: {
+    promptTokenCount?: number;
+    candidatesTokenCount?: number;
+  };
+  error?: {
+    message?: string;
+  };
+};
+
+function buildGeminiRequest(systemPrompt: string, text: string) {
+  return {
+    system_instruction: {
+      parts: [{ text: systemPrompt }],
+    },
+    contents: [
+      {
+        role: 'user',
+        parts: [{ text }],
+      },
+    ],
+    generationConfig: {
+      maxOutputTokens: 4096,
+    },
+  };
+}
+
+function extractGeminiText(response: GeminiGenerateContentResponse): string {
+  return (
+    response.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text ?? '')
+      .join('') ?? ''
+  );
+}
+
+function extractGeminiUsage(response: GeminiGenerateContentResponse) {
+  return {
+    inputTokens: response.usageMetadata?.promptTokenCount ?? 0,
+    outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
+  };
+}
+
+async function fetchGeminiGenerateContent(
+  apiKey: string,
+  systemPrompt: string,
+  text: string,
+): Promise<GeminiGenerateContentResponse> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${GEMINI_API_BASE}:generateContent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
+      body: JSON.stringify(buildGeminiRequest(systemPrompt, text)),
+      signal: controller.signal,
+    });
+
+    const json = (await response.json()) as GeminiGenerateContentResponse;
+
+    if (!response.ok) {
+      throw new Error(json.error?.message || `Gemini request failed with ${response.status}`);
+    }
+
+    return json;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 // ── Domain-specific instructions ──────────────────────────────────────
 
@@ -149,36 +229,14 @@ export async function translateNode(
 
 // ── Gemini via LangChain ──────────────────────────────────────────────
 
-async function translateWithGemini(
+export async function translateWithGemini(
   apiKey: string,
   systemPrompt: string,
   text: string,
 ): Promise<{ translatedText: string; usage: { inputTokens: number; outputTokens: number }; error: undefined }> {
-  const model = new ChatGoogleGenerativeAI({
-    model: 'gemini-2.0-flash',
-    maxOutputTokens: 4096,
-    apiKey,
-  });
-
-  const response = await model.invoke([
-    new SystemMessage(systemPrompt),
-    new HumanMessage(text),
-  ]);
-
-  const translatedText =
-    typeof response.content === 'string'
-      ? response.content
-      : response.content
-          .filter((c) => c.type === 'text')
-          .map((c) => ('text' in c ? c.text : ''))
-          .join('');
-
-  const usage = response.usage_metadata
-    ? {
-        inputTokens: response.usage_metadata.input_tokens,
-        outputTokens: response.usage_metadata.output_tokens,
-      }
-    : { inputTokens: 0, outputTokens: 0 };
+  const response = await fetchGeminiGenerateContent(apiKey, systemPrompt, text);
+  const translatedText = extractGeminiText(response);
+  const usage = extractGeminiUsage(response);
 
   return { translatedText, usage, error: undefined };
 }
@@ -206,15 +264,4 @@ async function translateWithWorkersAI(
     usage: { inputTokens: 0, outputTokens: 0 }, // Workers AI doesn't report token usage
     error: undefined,
   };
-}
-
-// ── Exported helpers for streaming in route handler ───────────────────
-
-export function createGeminiStreamingModel(apiKey: string) {
-  return new ChatGoogleGenerativeAI({
-    model: 'gemini-2.0-flash',
-    maxOutputTokens: 4096,
-    apiKey,
-    streaming: true,
-  });
 }

@@ -1,12 +1,11 @@
 import { Context } from 'hono';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { AppEnv, TranslateRequestBody } from '../types';
 import {
   buildTranslationGraph,
   detectLanguageNode,
   matchTermsNode,
   buildPromptNode,
-  createGeminiStreamingModel,
+  translateWithGemini,
 } from '../graph';
 
 const MAX_TEXT_LENGTH = 5000;
@@ -140,28 +139,18 @@ export async function translateHandler(c: Context<AppEnv>) {
 
       let modelUsed = 'none';
 
-      // ── Try Gemini streaming ──────────────────────────────────────
+      // ── Try Gemini first ──────────────────────────────────────────
       if (c.env.GEMINI_API_KEY) {
         try {
-          const model = createGeminiStreamingModel(c.env.GEMINI_API_KEY);
-          const langchainStream = await model.stream([
-            new SystemMessage(preparedState.systemPrompt),
-            new HumanMessage(preparedState.text),
-          ]);
+          const result = await translateWithGemini(
+            c.env.GEMINI_API_KEY,
+            preparedState.systemPrompt,
+            preparedState.text,
+          );
 
           modelUsed = 'gemini-2.0-flash';
-
-          for await (const chunk of langchainStream) {
-            const text =
-              typeof chunk.content === 'string'
-                ? chunk.content
-                : chunk.content
-                    .filter((block) => block.type === 'text')
-                    .map((block) => ('text' in block ? block.text : ''))
-                    .join('');
-            if (text) {
-              emit({ type: 'text_delta', text });
-            }
+          if (result.translatedText) {
+            emit({ type: 'text_delta', text: result.translatedText });
           }
 
           emit({
@@ -169,11 +158,12 @@ export async function translateHandler(c: Context<AppEnv>) {
             modelUsed,
             detectedLang: preparedState.detectedLang,
             matchedTerms: preparedState.matchedTerms,
+            usage: result.usage,
           });
           controller.close();
           return;
         } catch (err: unknown) {
-          console.warn('Gemini streaming failed, trying Workers AI fallback:', err instanceof Error ? err.message : err);
+          console.warn('Gemini request failed, trying Workers AI fallback:', err instanceof Error ? err.message : err);
         }
       }
 
@@ -201,6 +191,7 @@ export async function translateHandler(c: Context<AppEnv>) {
             modelUsed,
             detectedLang: preparedState.detectedLang,
             matchedTerms: preparedState.matchedTerms,
+            usage: { inputTokens: 0, outputTokens: 0 },
           });
           controller.close();
           return;
