@@ -114,6 +114,37 @@ const WORD_PATTERNS: [RegExp, string][] = [
   [/\b(il|la|di|che|è|un|una|non|per)\b/i, 'it'],
 ];
 
+function getTargetLanguageLabel(targetLang: string): string {
+  switch (targetLang) {
+    case 'zh':
+      return 'Simplified Chinese (简体中文)';
+    case 'en':
+      return 'English';
+    case 'ja':
+      return 'Japanese';
+    case 'ko':
+      return 'Korean';
+    case 'fr':
+      return 'French';
+    case 'de':
+      return 'German';
+    case 'es':
+      return 'Spanish';
+    case 'ru':
+      return 'Russian';
+    case 'pt':
+      return 'Portuguese';
+    case 'it':
+      return 'Italian';
+    case 'ar':
+      return 'Arabic';
+    case 'et':
+      return 'Estonian';
+    default:
+      return targetLang;
+  }
+}
+
 // ── Node: Detect Language ─────────────────────────────────────────────
 
 export async function detectLanguageNode(
@@ -167,13 +198,18 @@ export async function buildPromptNode(
   const { detectedLang, targetLang, domain, matchedTerms } = state;
 
   const sourceLangLabel = detectedLang || 'auto-detected';
+  const targetLangLabel = getTargetLanguageLabel(targetLang);
 
-  let system = `You are a professional translator. Translate the user-provided text from ${sourceLangLabel} to ${targetLang}.\n\n`;
+  let system = `You are a professional translator. Translate the user-provided text from ${sourceLangLabel} to ${targetLangLabel}.\n\n`;
   system += `Domain: ${domain}\n${DOMAIN_INSTRUCTIONS[domain] || DOMAIN_INSTRUCTIONS.general}\n\n`;
   system += 'Rules:\n';
   system += '- Output ONLY the translated text. No explanations, notes, or commentary.\n';
   system += '- Preserve the original formatting (line breaks, punctuation style).\n';
   system += '- Do not transliterate proper nouns unless the target language convention demands it.\n';
+  if (targetLang === 'zh') {
+    system += '- Use Simplified Chinese characters only. Do not use Traditional Chinese.\n';
+    system += '- Prefer Mainland China standard word choices and punctuation.\n';
+  }
 
   if (matchedTerms && matchedTerms.length > 0) {
     system +=
