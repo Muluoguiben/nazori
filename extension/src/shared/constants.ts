@@ -38,7 +38,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showTermHighlight: true,
 };
 
-export const API_BASE_URL = 'https://nazori-worker.YOUR_SUBDOMAIN.workers.dev';
+export const API_BASE_URL = 'https://nazori-worker.nazori-agent.workers.dev';
 
 export const MAX_TEXT_LENGTH = 5000;
 
