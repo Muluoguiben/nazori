@@ -174,8 +174,11 @@ export async function translateStream(
 
   // --- Build API request ---------------------------------------------------
 
-  const body: TranslateRequest & { terms?: { source: string; target: string }[] } = {
-    ...request,
+  const apiBody = {
+    text: request.text,
+    source_lang: request.sourceLang,
+    target_lang: request.targetLang,
+    domain: request.domain,
     terms: matchedTerms.length > 0 ? matchedTerms : request.terms,
   };
 
@@ -197,7 +200,7 @@ export async function translateStream(
         'Content-Type': 'application/json',
         'X-Device-Id': deviceId,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(apiBody),
       signal: controller.signal,
     });
 
@@ -259,25 +262,26 @@ export async function translateStream(
         try {
           const parsed = JSON.parse(sseEvent.data) as Record<string, unknown>;
 
-          if (sseEvent.event === 'delta' || parsed.delta !== undefined) {
-            const delta = (parsed.delta as string) ?? '';
-            fullText += delta;
+          if (parsed.type === 'text_delta') {
+            const text = (parsed.text as string) ?? '';
+            fullText += text;
             if (!disconnected) {
-              port.postMessage(makeMessage('TRANSLATE_STREAM_CHUNK', { text: delta }, requestId));
+              port.postMessage(makeMessage('TRANSLATE_STREAM_CHUNK', { text }, requestId));
             }
-          }
-
-          if (parsed.detectedLang !== undefined) {
-            detectedLang = parsed.detectedLang as LangCode;
-          }
-
-          if (parsed.usage !== undefined) {
-            usage = parsed.usage as { inputTokens: number; outputTokens: number };
-          }
-
-          // Some backends send the matched terms back
-          if (parsed.matchedTerms !== undefined) {
-            matchedTerms = parsed.matchedTerms as { source: string; target: string }[];
+          } else if (parsed.type === 'message_stop') {
+            if (parsed.detectedLang !== undefined) {
+              detectedLang = parsed.detectedLang as LangCode;
+            }
+            if (parsed.matchedTerms !== undefined) {
+              matchedTerms = parsed.matchedTerms as { source: string; target: string }[];
+            }
+          } else if (parsed.type === 'error') {
+            if (!disconnected) {
+              port.postMessage(
+                makeMessage('TRANSLATE_ERROR', { code: 'TRANSLATION_FAILED', message: parsed.error as string }, requestId),
+              );
+            }
+            return;
           }
         } catch {
           // Ignore unparseable lines (comments, keep-alive, etc.)
