@@ -36,5 +36,5 @@ export {
   matchTermsNode,
   buildPromptNode,
   translateNode,
-  createGeminiStreamingModel,
+  translateWithGemini,
 } from './nodes';
