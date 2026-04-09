@@ -118,6 +118,8 @@ function getTargetLanguageLabel(targetLang: string): string {
   switch (targetLang) {
     case 'zh':
       return 'Simplified Chinese (简体中文)';
+    case 'zh-Hant':
+      return 'Traditional Chinese (繁體中文)';
     case 'en':
       return 'English';
     case 'ja':
@@ -209,6 +211,10 @@ export async function buildPromptNode(
   if (targetLang === 'zh') {
     system += '- Use Simplified Chinese characters only. Do not use Traditional Chinese.\n';
     system += '- Prefer Mainland China standard word choices and punctuation.\n';
+  }
+  if (targetLang === 'zh-Hant') {
+    system += '- Use Traditional Chinese characters only. Do not use Simplified Chinese.\n';
+    system += '- Prefer Taiwan standard word choices and punctuation.\n';
   }
 
   if (matchedTerms && matchedTerms.length > 0) {

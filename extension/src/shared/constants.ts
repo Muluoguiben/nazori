@@ -1,7 +1,8 @@
 import type { Domain, Language, LangCode, Settings } from './types';
 
 export const LANGUAGES: Language[] = [
-  { code: 'zh', name: 'Chinese', nativeName: '中文', direction: 'ltr' },
+  { code: 'zh', name: 'Chinese (Simplified)', nativeName: '简体中文', direction: 'ltr' },
+  { code: 'zh-Hant', name: 'Chinese (Traditional)', nativeName: '繁體中文', direction: 'ltr' },
   { code: 'en', name: 'English', nativeName: 'English', direction: 'ltr' },
   { code: 'et', name: 'Estonian', nativeName: 'Eesti', direction: 'ltr' },
   { code: 'ja', name: 'Japanese', nativeName: '日本語', direction: 'ltr' },

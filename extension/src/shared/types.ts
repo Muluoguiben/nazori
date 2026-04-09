@@ -1,4 +1,4 @@
-export type LangCode = 'zh' | 'en' | 'et' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'ru' | 'pt' | 'it' | 'ar';
+export type LangCode = 'zh' | 'zh-Hant' | 'en' | 'et' | 'ja' | 'ko' | 'fr' | 'de' | 'es' | 'ru' | 'pt' | 'it' | 'ar';
 
 export interface Language {
   code: LangCode;
