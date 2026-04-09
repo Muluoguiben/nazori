@@ -100,12 +100,12 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
       switch (msg.type) {
         case 'TRANSLATE_STREAM_CHUNK': {
           const payload = msg.payload as {
-            chunk: string;
+            text: string;
             detectedLang?: LangCode;
           };
           setIsLoading(false);
           setIsStreaming(true);
-          setTranslatedText((prev) => prev + payload.chunk);
+          setTranslatedText((prev) => prev + payload.text);
           if (payload.detectedLang) {
             setDetectedLang(payload.detectedLang);
           }
