@@ -174,8 +174,11 @@ export async function translateStream(
 
   // --- Build API request ---------------------------------------------------
 
-  const body: TranslateRequest & { terms?: { source: string; target: string }[] } = {
-    ...request,
+  const body = {
+    text: request.text,
+    source_lang: request.sourceLang,
+    target_lang: request.targetLang,
+    domain: request.domain,
     terms: matchedTerms.length > 0 ? matchedTerms : request.terms,
   };
 
@@ -259,12 +262,45 @@ export async function translateStream(
         try {
           const parsed = JSON.parse(sseEvent.data) as Record<string, unknown>;
 
-          if (sseEvent.event === 'delta' || parsed.delta !== undefined) {
-            const delta = (parsed.delta as string) ?? '';
+          if (
+            sseEvent.event === 'delta' ||
+            parsed.delta !== undefined ||
+            parsed.type === 'text_delta'
+          ) {
+            const delta =
+              typeof parsed.delta === 'string'
+                ? parsed.delta
+                : typeof parsed.text === 'string'
+                  ? parsed.text
+                  : '';
             fullText += delta;
             if (!disconnected) {
               port.postMessage(makeMessage('TRANSLATE_STREAM_CHUNK', { text: delta }, requestId));
             }
+          }
+
+          if (parsed.type === 'message_stop') {
+            if (parsed.detectedLang !== undefined) {
+              detectedLang = parsed.detectedLang as LangCode;
+            }
+
+            if (parsed.matchedTerms !== undefined) {
+              matchedTerms = parsed.matchedTerms as { source: string; target: string }[];
+            }
+
+            if (parsed.usage !== undefined) {
+              usage = parsed.usage as { inputTokens: number; outputTokens: number };
+            }
+          }
+
+          if (parsed.type === 'error') {
+            const message =
+              typeof parsed.error === 'string' ? parsed.error : 'Unknown translation error';
+            port.postMessage(
+              makeMessage('TRANSLATE_ERROR', { code: 'TRANSLATION_FAILED', message }, requestId),
+            );
+            reader.cancel();
+            return;
           }
 
           if (parsed.detectedLang !== undefined) {
