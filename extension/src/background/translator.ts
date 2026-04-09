@@ -9,7 +9,7 @@ import type {
   Settings,
   StorageSchema,
 } from '../shared/types';
-import { API_BASE_URL, MAX_TEXT_LENGTH } from '../shared/constants';
+import { API_BASE_URL, MAX_TEXT_LENGTH, CACHE_SIZE } from '../shared/constants';
 import { LRUCache, makeCacheKey } from './cache';
 import { matchTerms } from './terms';
 import { nanoid } from 'nanoid';
@@ -18,7 +18,7 @@ import { nanoid } from 'nanoid';
 // Module-level translation cache
 // ---------------------------------------------------------------------------
 
-const translationCache = new LRUCache<TranslateResponse>(100);
+const translationCache = new LRUCache<TranslateResponse>(CACHE_SIZE);
 
 export { translationCache };
 

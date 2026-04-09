@@ -44,4 +44,8 @@ export const MAX_TEXT_LENGTH = 5000;
 
 export const DEBOUNCE_MS = 300;
 
+// LRU translation cache capacity. At ~1 KB per cached response and 100 entries,
+// memory usage stays under 100 KB — negligible for a service worker. Sized to
+// cover a typical browsing session (user translates ~50-80 snippets/day) with
+// room for repeated lookups on multi-language pages.
 export const CACHE_SIZE = 100;

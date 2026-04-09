@@ -236,6 +236,19 @@ async function handleMessage(
 }
 
 // ---------------------------------------------------------------------------
+// Keyboard shortcut (Alt+T toggle)
+// ---------------------------------------------------------------------------
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command !== 'toggle-translation') return;
+
+  const result = await chrome.storage.local.get('settings');
+  const settings = (result.settings as Settings) ?? DEFAULT_SETTINGS;
+  const updated: Settings = { ...settings, enabled: !settings.enabled };
+  await chrome.storage.local.set({ settings: updated });
+});
+
+// ---------------------------------------------------------------------------
 // Context menu
 // ---------------------------------------------------------------------------
 
