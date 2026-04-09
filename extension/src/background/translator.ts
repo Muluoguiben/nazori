@@ -191,7 +191,7 @@ export async function translateStream(
   port.onDisconnect.addListener(onDisconnect);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/translate/stream`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/translate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
