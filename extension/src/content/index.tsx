@@ -104,9 +104,22 @@ function handleKeyDown(e: KeyboardEvent) {
 function handleScroll() {
   if (!currentSelection) return;
 
-  // On scroll, close the bubble because the selection rect is stale
-  // relative to the viewport. A new selection will re-trigger.
-  closeBubble();
+  // Re-check whether the user's selection still exists
+  const sel = window.getSelection();
+  const text = sel?.toString().trim();
+  if (!text || sel!.rangeCount === 0) {
+    closeBubble();
+    return;
+  }
+
+  // Selection still exists — update the bubble position with the fresh rect
+  const rect = sel!.getRangeAt(0).getBoundingClientRect();
+  if (rect.width === 0 && rect.height === 0) {
+    closeBubble();
+    return;
+  }
+
+  showBubble({ text: currentSelection.text, rect });
 }
 
 // ---------- Bootstrap ----------

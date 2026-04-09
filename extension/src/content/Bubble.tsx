@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
-import { LANGUAGES, DOMAIN_LABELS, DOMAINS, DEFAULT_SETTINGS } from '@shared/constants';
-import type { Domain, LangCode, Message } from '@shared/types';
+import { LANGUAGES, DOMAIN_LABELS, DOMAINS, DEFAULT_SETTINGS, TRANSLATE_MODES, MODE_LABELS } from '@shared/constants';
+import type { Domain, LangCode, Message, TranslateMode } from '@shared/types';
 import { calculateBubblePosition } from './SelectionHandler';
 
 interface BubbleProps {
@@ -23,10 +23,18 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
   const [copied, setCopied] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [mode, setMode] = useState<TranslateMode>('normal');
+  const [isRefining, setIsRefining] = useState(false);
 
   const bubbleRef = useRef<HTMLDivElement>(null);
   const portRef = useRef<chrome.runtime.Port | null>(null);
   const requestIdRef = useRef<string>('');
+  const targetLangRef = useRef(targetLang);
+  const domainRef = useRef(domain);
+  const modeRef = useRef(mode);
+  targetLangRef.current = targetLang;
+  domainRef.current = domain;
+  modeRef.current = mode;
 
   // ---------- Position ----------
   const [position, setPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
@@ -72,6 +80,7 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
     setError(null);
     setIsLoading(true);
     setIsStreaming(false);
+    setIsRefining(false);
 
     const port = chrome.runtime.connect({ name: 'translate-stream' });
     portRef.current = port;
@@ -84,8 +93,9 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
       payload: {
         text: sourceText,
         sourceLang: 'auto',
-        targetLang,
-        domain,
+        targetLang: targetLangRef.current,
+        domain: domainRef.current,
+        mode: modeRef.current,
       },
       requestId: reqId,
       timestamp: Date.now(),
@@ -109,6 +119,16 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
           if (payload.detectedLang) {
             setDetectedLang(payload.detectedLang);
           }
+          break;
+        }
+        case 'TRANSLATE_STREAM_REFINE_START': {
+          setIsRefining(true);
+          break;
+        }
+        case 'TRANSLATE_STREAM_RESET': {
+          setTranslatedText('');
+          setIsLoading(true);
+          setIsStreaming(false);
           break;
         }
         case 'TRANSLATE_STREAM_END': {
@@ -135,9 +155,11 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
     port.onDisconnect.addListener(() => {
       portRef.current = null;
     });
-  }, [sourceText, targetLang, domain]);
+  // sourceText is the only real trigger — language/domain changes re-translate below
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceText]);
 
-  // Trigger translation on mount and when language/domain changes
+  // Trigger translation on mount
   useEffect(() => {
     startTranslation();
     return () => {
@@ -147,6 +169,17 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
       }
     };
   }, [startTranslation]);
+
+  // Re-translate when user switches language, domain, or mode (skip initial mount)
+  const hasMountedRef = useRef(false);
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    startTranslation();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetLang, domain, mode]);
 
   // ---------- Keyboard ----------
   useEffect(() => {
@@ -266,6 +299,20 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
             </option>
           ))}
         </select>
+
+        {/* Mode */}
+        <select
+          className="nazori-select nazori-select--mode"
+          value={mode}
+          onChange={(e) => setMode(e.target.value as TranslateMode)}
+          aria-label="Translation mode"
+        >
+          {TRANSLATE_MODES.map((m) => (
+            <option key={m} value={m}>
+              {MODE_LABELS[m]}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Translation area */}
@@ -289,6 +336,10 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
               Retry
             </button>
           </div>
+        )}
+
+        {isRefining && isLoading && !translatedText && (
+          <div className="nazori-refining-hint">Polishing translation&#x2026;</div>
         )}
 
         {translatedText && (

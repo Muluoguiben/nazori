@@ -1,4 +1,4 @@
-import type { Domain, Language, LangCode, Settings } from './types';
+import type { Domain, Language, LangCode, Settings, TranslateMode } from './types';
 
 export const LANGUAGES: Language[] = [
   { code: 'zh', name: 'Chinese (Simplified)', nativeName: '简体中文', direction: 'ltr' },
@@ -27,6 +27,14 @@ export const DOMAIN_LABELS: Record<Domain, string> = {
   legal: 'Legal',
   medical: 'Medical',
   tech: 'Technology',
+};
+
+export const TRANSLATE_MODES: TranslateMode[] = ['quick', 'normal', 'refined'];
+
+export const MODE_LABELS: Record<TranslateMode, string> = {
+  quick: 'Quick',
+  normal: 'Normal',
+  refined: 'Refined',
 };
 
 export const DEFAULT_SETTINGS: Settings = {

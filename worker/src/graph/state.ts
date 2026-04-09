@@ -1,4 +1,5 @@
 import { Annotation } from '@langchain/langgraph';
+import type { TranslateMode } from '../types';
 
 /**
  * Translation graph state definition.
@@ -11,6 +12,7 @@ export const TranslationState = Annotation.Root({
   targetLang: Annotation<string>,
   domain: Annotation<'general' | 'legal' | 'medical' | 'tech'>,
   inputTerms: Annotation<{ source: string; target: string }[]>,
+  mode: Annotation<TranslateMode>,
 
   // ── Model config ───────────────────────────────────────────────────
   geminiApiKey: Annotation<string>,
@@ -20,6 +22,10 @@ export const TranslationState = Annotation.Root({
   detectedLang: Annotation<string>,
   matchedTerms: Annotation<{ source: string; target: string }[]>,
   systemPrompt: Annotation<string>,
+
+  // ── Refined mode intermediate ──────────────────────────────────────
+  draftText: Annotation<string>,
+  refinePrompt: Annotation<string>,
 
   // ── Output ─────────────────────────────────────────────────────────
   translatedText: Annotation<string>,

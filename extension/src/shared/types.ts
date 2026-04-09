@@ -9,6 +9,8 @@ export interface Language {
 
 export type Domain = 'general' | 'legal' | 'medical' | 'tech';
 
+export type TranslateMode = 'quick' | 'normal' | 'refined';
+
 export interface Term {
   id: string;
   domain: Domain;
@@ -23,6 +25,7 @@ export interface TranslateRequest {
   sourceLang: 'auto' | LangCode;
   targetLang: LangCode;
   domain: Domain;
+  mode?: TranslateMode;
   terms?: { source: string; target: string }[];
 }
 
@@ -37,6 +40,8 @@ export type MessageType =
   | 'TRANSLATE_REQUEST'
   | 'TRANSLATE_RESPONSE'
   | 'TRANSLATE_STREAM_CHUNK'
+  | 'TRANSLATE_STREAM_RESET'
+  | 'TRANSLATE_STREAM_REFINE_START'
   | 'TRANSLATE_STREAM_END'
   | 'TRANSLATE_ERROR'
   | 'TERMS_GET'

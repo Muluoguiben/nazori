@@ -1,9 +1,12 @@
+export type TranslateMode = 'quick' | 'normal' | 'refined';
+
 export interface TranslateRequestBody {
   text: string;
   source_lang: string; // 'auto' or lang code
   target_lang: string;
   domain: 'general' | 'legal' | 'medical' | 'tech';
   terms: { source: string; target: string }[];
+  mode: TranslateMode;
 }
 
 export interface Env {

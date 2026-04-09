@@ -26,7 +26,8 @@ export { translationCache };
 // Helpers
 // ---------------------------------------------------------------------------
 
-const STREAM_TIMEOUT_MS = 15_000;
+const STREAM_TIMEOUT_MS = 30_000;
+const STREAM_TIMEOUT_REFINED_MS = 60_000;
 
 function makeMessage<T>(type: Message['type'], payload: T, requestId: string): Message<T> {
   return { type, payload, timestamp: Date.now(), requestId };
@@ -147,6 +148,7 @@ export async function translateStream(
     request.sourceLang,
     request.targetLang,
     request.domain,
+    request.mode ?? 'normal',
   );
 
   const cached = translationCache.get(cacheKey);
@@ -179,11 +181,13 @@ export async function translateStream(
     source_lang: request.sourceLang,
     target_lang: request.targetLang,
     domain: request.domain,
+    mode: request.mode ?? 'normal',
     terms: matchedTerms.length > 0 ? matchedTerms : request.terms,
   };
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), STREAM_TIMEOUT_MS);
+  const timeoutMs = (request.mode === 'refined') ? STREAM_TIMEOUT_REFINED_MS : STREAM_TIMEOUT_MS;
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   // Track whether the port was disconnected so we can stop processing.
   let disconnected = false;
@@ -290,6 +294,19 @@ export async function translateStream(
 
             if (parsed.usage !== undefined) {
               usage = parsed.usage as { inputTokens: number; outputTokens: number };
+            }
+          }
+
+          if (parsed.type === 'refine_start') {
+            if (!disconnected) {
+              port.postMessage(makeMessage('TRANSLATE_STREAM_REFINE_START', {}, requestId));
+            }
+          }
+
+          if (parsed.type === 'text_reset') {
+            fullText = '';
+            if (!disconnected) {
+              port.postMessage(makeMessage('TRANSLATE_STREAM_RESET', {}, requestId));
             }
           }
 

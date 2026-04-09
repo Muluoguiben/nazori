@@ -8,8 +8,9 @@ export function makeCacheKey(
   sourceLang: string,
   targetLang: string,
   domain: string,
+  mode = 'normal',
 ): string {
-  return `${text}\0${sourceLang}\0${targetLang}\0${domain}`;
+  return `${text}\0${sourceLang}\0${targetLang}\0${domain}\0${mode}`;
 }
 
 /**

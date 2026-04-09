@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectLanguageNode, matchTermsNode, buildPromptNode } from '../src/graph/nodes';
+import { detectLanguageNode, matchTermsNode, buildPromptNode, buildRefinePromptNode } from '../src/graph/nodes';
 import { validateBody } from '../src/routes/translate';
 import type { TranslationStateType } from '../src/graph/state';
 
@@ -14,11 +14,14 @@ function makeState(overrides: Partial<TranslationStateType> = {}): TranslationSt
     targetLang: 'zh',
     domain: 'general',
     inputTerms: [],
+    mode: 'normal',
     geminiApiKey: 'test-key',
     ai: null,
     detectedLang: '',
     matchedTerms: [],
     systemPrompt: '',
+    draftText: '',
+    refinePrompt: '',
     translatedText: '',
     modelUsed: '',
     usage: { inputTokens: 0, outputTokens: 0 },
@@ -183,6 +186,77 @@ describe('buildPromptNode', () => {
     );
     expect(result.systemPrompt).toContain('software/engineering');
   });
+
+  it('quick mode produces minimal prompt', async () => {
+    const result = await buildPromptNode(
+      makeState({ detectedLang: 'en', targetLang: 'zh', mode: 'quick', matchedTerms: [] }),
+    );
+    expect(result.systemPrompt).toContain('Output ONLY');
+    expect(result.systemPrompt).not.toContain('Rewrite into natural');
+  });
+
+  it('normal mode includes baoyu-style principles', async () => {
+    const result = await buildPromptNode(
+      makeState({ detectedLang: 'en', targetLang: 'zh', mode: 'normal', matchedTerms: [] }),
+    );
+    expect(result.systemPrompt).toContain('Rewrite into natural');
+    expect(result.systemPrompt).toContain('Natural flow');
+    expect(result.systemPrompt).toContain('Accuracy first');
+  });
+
+  it('normal mode zh includes anti-translationese rules', async () => {
+    const result = await buildPromptNode(
+      makeState({ detectedLang: 'en', targetLang: 'zh', mode: 'normal', matchedTerms: [] }),
+    );
+    expect(result.systemPrompt).toContain('over-nominalization');
+  });
+
+  it('refined mode also uses baoyu-style principles', async () => {
+    const result = await buildPromptNode(
+      makeState({ detectedLang: 'en', targetLang: 'zh', mode: 'refined', matchedTerms: [] }),
+    );
+    expect(result.systemPrompt).toContain('Rewrite into natural');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildRefinePromptNode
+// ---------------------------------------------------------------------------
+
+describe('buildRefinePromptNode', () => {
+  it('includes source text and draft in refine prompt', async () => {
+    const result = await buildRefinePromptNode(
+      makeState({
+        text: 'Hello world',
+        draftText: '你好世界',
+        targetLang: 'zh',
+        domain: 'general',
+        matchedTerms: [],
+      }),
+    );
+    expect(result.refinePrompt).toContain('Hello world');
+    expect(result.refinePrompt).toContain('你好世界');
+    expect(result.refinePrompt).toContain('senior translation reviewer');
+  });
+
+  it('includes glossary in refine prompt when terms exist', async () => {
+    const result = await buildRefinePromptNode(
+      makeState({
+        text: 'test',
+        draftText: '测试',
+        targetLang: 'zh',
+        matchedTerms: [{ source: 'API', target: '接口' }],
+      }),
+    );
+    expect(result.refinePrompt).toContain('"API" -> "接口"');
+  });
+
+  it('includes CJK-specific review criteria for zh target', async () => {
+    const result = await buildRefinePromptNode(
+      makeState({ text: 'test', draftText: '测试', targetLang: 'zh', matchedTerms: [] }),
+    );
+    expect(result.refinePrompt).toContain('over-nominalization');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -238,6 +312,7 @@ describe('validateBody', () => {
     if (r.valid) {
       expect(r.data.source_lang).toBe('auto');
       expect(r.data.domain).toBe('general');
+      expect(r.data.mode).toBe('normal');
       expect(r.data.terms).toEqual([]);
     }
   });
@@ -248,12 +323,20 @@ describe('validateBody', () => {
       source_lang: 'en',
       target_lang: 'zh',
       domain: 'legal',
+      mode: 'refined',
       terms: [{ source: 'contract', target: '合同' }],
     });
     expect(r.valid).toBe(true);
     if (r.valid) {
       expect(r.data.domain).toBe('legal');
+      expect(r.data.mode).toBe('refined');
       expect(r.data.terms).toHaveLength(1);
     }
+  });
+
+  it('defaults invalid mode to normal', () => {
+    const r = validateBody({ text: 'hello', target_lang: 'zh', mode: 'invalid' });
+    expect(r.valid).toBe(true);
+    if (r.valid) expect(r.data.mode).toBe('normal');
   });
 });

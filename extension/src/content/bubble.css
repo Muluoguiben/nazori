@@ -142,6 +142,11 @@
   outline-offset: 1px;
 }
 
+.nazori-select--mode {
+  margin-left: auto;
+  font-weight: 500;
+}
+
 .nazori-arrow-icon {
   font-size: 12px;
   color: #888;
@@ -174,6 +179,14 @@
 @keyframes nazori-cursor-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+/* --- Refining hint --- */
+.nazori-refining-hint {
+  font-size: 13px;
+  color: #6b7280;
+  font-style: italic;
+  padding: 4px 0;
 }
 
 /* --- Loading skeleton --- */
@@ -370,6 +383,10 @@
 
   .nazori-translation-text {
     color: #e0e0e0;
+  }
+
+  .nazori-refining-hint {
+    color: #9ca3af;
   }
 
   .nazori-skeleton-line {
