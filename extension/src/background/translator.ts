@@ -389,6 +389,122 @@ export async function translateStream(
 }
 
 // ---------------------------------------------------------------------------
+// Explain stream handler
+// ---------------------------------------------------------------------------
+
+export async function explainStream(
+  port: chrome.runtime.Port,
+  request: { originalText: string; translatedText: string; question: string; targetLang: string },
+  requestId: string,
+): Promise<void> {
+  let deviceId: string;
+  try {
+    const stored = await chrome.storage.local.get('device_id');
+    deviceId = (stored.device_id as string) ?? '';
+  } catch {
+    port.postMessage(makeMessage('EXPLAIN_ERROR', { message: 'Failed to read settings' }, requestId));
+    return;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), STREAM_TIMEOUT_MS);
+
+  let disconnected = false;
+  const onDisconnect = () => {
+    disconnected = true;
+    controller.abort();
+  };
+  port.onDisconnect.addListener(onDisconnect);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/explain`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Device-Id': deviceId,
+      },
+      body: JSON.stringify(request),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      if (!disconnected) {
+        port.postMessage(
+          makeMessage('EXPLAIN_ERROR', { message: `Server responded with ${response.status}` }, requestId),
+        );
+      }
+      return;
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      if (!disconnected) {
+        port.postMessage(makeMessage('EXPLAIN_ERROR', { message: 'No response body' }, requestId));
+      }
+      return;
+    }
+
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      if (disconnected) { reader.cancel(); return; }
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const events = parseSSEChunk(buffer);
+      const lastDoubleNewline = buffer.lastIndexOf('\n\n');
+      buffer = lastDoubleNewline >= 0 ? buffer.slice(lastDoubleNewline + 2) : buffer;
+
+      for (const sseEvent of events) {
+        if (sseEvent.data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(sseEvent.data) as Record<string, unknown>;
+          if (parsed.type === 'text_delta' && typeof parsed.text === 'string') {
+            if (!disconnected) {
+              port.postMessage(makeMessage('EXPLAIN_STREAM_CHUNK', { text: parsed.text }, requestId));
+            }
+          }
+          if (parsed.type === 'message_stop') {
+            if (!disconnected) {
+              port.postMessage(makeMessage('EXPLAIN_STREAM_END', {}, requestId));
+            }
+          }
+          if (parsed.type === 'error') {
+            if (!disconnected) {
+              port.postMessage(
+                makeMessage('EXPLAIN_ERROR', { message: parsed.error ?? 'Unknown error' }, requestId),
+              );
+            }
+            reader.cancel();
+            return;
+          }
+        } catch { /* skip */ }
+      }
+    }
+
+    if (!disconnected) {
+      port.postMessage(makeMessage('EXPLAIN_STREAM_END', {}, requestId));
+    }
+  } catch (err: unknown) {
+    clearTimeout(timeout);
+    if (disconnected) return;
+    const isAbort = err instanceof DOMException && err.name === 'AbortError';
+    port.postMessage(
+      makeMessage('EXPLAIN_ERROR', {
+        message: isAbort ? 'Request timed out' : (err instanceof Error ? err.message : 'Unknown error'),
+      }, requestId),
+    );
+  } finally {
+    clearTimeout(timeout);
+    port.onDisconnect.removeListener(onDisconnect);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // HTTP status -> ErrorCode mapping
 // ---------------------------------------------------------------------------
 

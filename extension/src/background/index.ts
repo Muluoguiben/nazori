@@ -17,7 +17,7 @@ import {
   importTerms,
   exportTerms,
 } from './terms';
-import { translateStream, translationCache } from './translator';
+import { translateStream, explainStream, translationCache } from './translator';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -114,25 +114,27 @@ async function runMigrations(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 chrome.runtime.onConnect.addListener((port) => {
-  if (port.name !== 'translate-stream') return;
+  if (port.name === 'translate-stream') {
+    port.onMessage.addListener((msg: Message<TranslateRequest>) => {
+      if (msg.type !== 'TRANSLATE_REQUEST') return;
+      translateStream(port, msg.payload, msg.requestId);
+    });
+    return;
+  }
 
-  let abortCleanup: (() => void) | null = null;
-
-  port.onMessage.addListener((msg: Message<TranslateRequest>) => {
-    if (msg.type !== 'TRANSLATE_REQUEST') return;
-
-    // translateStream is async but we don't await it here; it manages its own
-    // lifecycle and posts messages back through the port.
-    translateStream(port, msg.payload, msg.requestId);
-  });
-
-  port.onDisconnect.addListener(() => {
-    // Port disconnection is handled inside translateStream via its own
-    // onDisconnect listener. Nothing extra needed here, but we clean up
-    // our reference.
-    abortCleanup?.();
-    abortCleanup = null;
-  });
+  if (port.name === 'explain-stream') {
+    port.onMessage.addListener((msg: Message) => {
+      if (msg.type !== 'EXPLAIN_REQUEST') return;
+      const payload = msg.payload as {
+        originalText: string;
+        translatedText: string;
+        question: string;
+        targetLang: string;
+      };
+      explainStream(port, payload, msg.requestId);
+    });
+    return;
+  }
 });
 
 // ---------------------------------------------------------------------------
