@@ -9,7 +9,7 @@ import type { TranslationStateType } from '../src/graph/state';
 
 function makeState(overrides: Partial<TranslationStateType> = {}): TranslationStateType {
   return {
-    text: 'Hello world',
+    text: 'The quick brown fox jumps over the lazy dog',
     sourceLang: 'auto',
     targetLang: 'zh',
     domain: 'general',
@@ -20,6 +20,7 @@ function makeState(overrides: Partial<TranslationStateType> = {}): TranslationSt
     detectedLang: '',
     matchedTerms: [],
     systemPrompt: '',
+    isWordLookup: false,
     draftText: '',
     refinePrompt: '',
     translatedText: '',
@@ -217,6 +218,33 @@ describe('buildPromptNode', () => {
     );
     expect(result.systemPrompt).toContain('Rewrite into natural');
   });
+
+  it('word lookup mode for short text', async () => {
+    const result = await buildPromptNode(
+      makeState({ text: 'serendipity', detectedLang: 'en', targetLang: 'zh', matchedTerms: [] }),
+    );
+    expect(result.isWordLookup).toBe(true);
+    expect(result.systemPrompt).toContain('[Translation]');
+    expect(result.systemPrompt).toContain('[Pronunciation]');
+    expect(result.systemPrompt).toContain('[Meaning]');
+    expect(result.systemPrompt).toContain('[Usage]');
+  });
+
+  it('word lookup mode for CJK idiom', async () => {
+    const result = await buildPromptNode(
+      makeState({ text: '塞翁失马', detectedLang: 'zh', targetLang: 'en', matchedTerms: [] }),
+    );
+    expect(result.isWordLookup).toBe(true);
+    expect(result.systemPrompt).toContain('[Meaning]');
+  });
+
+  it('does not trigger word lookup for sentences', async () => {
+    const result = await buildPromptNode(
+      makeState({ detectedLang: 'en', targetLang: 'zh', matchedTerms: [] }),
+    );
+    expect(result.isWordLookup).toBeFalsy();
+    expect(result.systemPrompt).toContain('professional translator');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -227,15 +255,15 @@ describe('buildRefinePromptNode', () => {
   it('includes source text and draft in refine prompt', async () => {
     const result = await buildRefinePromptNode(
       makeState({
-        text: 'Hello world',
-        draftText: '你好世界',
+        text: 'The quick brown fox jumps over the lazy dog',
+        draftText: '敏捷的棕色狐狸跳过了懒惰的狗',
         targetLang: 'zh',
         domain: 'general',
         matchedTerms: [],
       }),
     );
-    expect(result.refinePrompt).toContain('Hello world');
-    expect(result.refinePrompt).toContain('你好世界');
+    expect(result.refinePrompt).toContain('The quick brown fox jumps over the lazy dog');
+    expect(result.refinePrompt).toContain('敏捷的棕色狐狸跳过了懒惰的狗');
     expect(result.refinePrompt).toContain('senior translation reviewer');
   });
 
