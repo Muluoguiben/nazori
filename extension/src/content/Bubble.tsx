@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { LANGUAGES, DOMAIN_LABELS, DOMAINS, DEFAULT_SETTINGS, TRANSLATE_MODES, MODE_LABELS } from '@shared/constants';
-import type { Domain, LangCode, Message, TranslateMode } from '@shared/types';
+import type { Domain, LangCode, Message, Settings, TranslateMode } from '@shared/types';
 import { calculateBubblePosition } from './SelectionHandler';
 
 interface BubbleProps {
@@ -26,6 +26,8 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
   const [mode, setMode] = useState<TranslateMode>('normal');
   const [isRefining, setIsRefining] = useState(false);
   const [isWordLookup, setIsWordLookup] = useState(false);
+  const [fontSize, setFontSize] = useState<Settings['fontSize']>('medium');
+  const [showTermHighlight, setShowTermHighlight] = useState(true);
 
   // Follow-up explain
   const [explainQuestion, setExplainQuestion] = useState('');
@@ -73,6 +75,8 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
         if (s.defaultTargetLang) setTargetLang(s.defaultTargetLang);
         if (s.defaultDomain) setDomain(s.defaultDomain);
         if (s.defaultMode) setMode(s.defaultMode);
+        if (s.fontSize) setFontSize(s.fontSize);
+        if (s.showTermHighlight !== undefined) setShowTermHighlight(s.showTermHighlight);
       }
     });
   }, []);
@@ -334,6 +338,41 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
     };
   }, []);
 
+  // ---------- Font size ----------
+  const fontSizePx = fontSize === 'small' ? 12 : fontSize === 'large' ? 16 : 14;
+
+  // ---------- Term highlighting ----------
+  const highlightTerms = (text: string): (string | React.ReactElement)[] => {
+    if (!showTermHighlight || matchedTerms.length === 0) return [text];
+
+    const targets = matchedTerms.map((t) => t.target).filter(Boolean);
+    if (targets.length === 0) return [text];
+
+    // Build regex from term targets, longest first to avoid partial matches
+    const sorted = [...targets].sort((a, b) => b.length - a.length);
+    const escaped = sorted.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+
+    const parts: (string | React.ReactElement)[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      parts.push(
+        <mark key={match.index} className="nazori-term-highlight">{match[0]}</mark>,
+      );
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts;
+  };
+
   // ---------- Truncated source ----------
   const truncatedSource =
     sourceText.length > MAX_SOURCE_DISPLAY
@@ -462,8 +501,10 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
         )}
 
         {translatedText && (
-          <div className="nazori-translation-text">
-            {isWordLookup ? renderDictSections(translatedText) : translatedText}
+          <div className="nazori-translation-text" style={{ fontSize: `${fontSizePx}px` }}>
+            {isWordLookup
+              ? renderDictSections(translatedText)
+              : highlightTerms(translatedText)}
             {isStreaming && <span className="nazori-cursor" aria-hidden="true" />}
           </div>
         )}

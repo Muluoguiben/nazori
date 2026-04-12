@@ -2,7 +2,8 @@ import { createRoot, type Root } from 'react-dom/client';
 import { createShadowHost, removeShadowHost } from './shadow';
 import { getSelectionInfo, type SelectionInfo } from './SelectionHandler';
 import Bubble from './Bubble';
-import { DEBOUNCE_MS } from '@shared/constants';
+import { DEBOUNCE_MS, DEFAULT_SETTINGS } from '@shared/constants';
+import type { Settings } from '@shared/types';
 
 // ---------- State ----------
 let host: HTMLElement | null = null;
@@ -10,6 +11,7 @@ let shadowRoot: ShadowRoot | null = null;
 let reactRoot: Root | null = null;
 let currentSelection: SelectionInfo | null = null;
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+let triggerMode: Settings['triggerMode'] = DEFAULT_SETTINGS.triggerMode;
 
 // ---------- Helpers ----------
 
@@ -64,28 +66,58 @@ function isInsideBubble(el: EventTarget | null): boolean {
   return host.contains(el) || el === host;
 }
 
+/** Check enabled + show bubble for current selection. */
+function tryShowBubble(info: SelectionInfo) {
+  chrome.storage.local.get('settings', (result) => {
+    const settings = result.settings;
+    const enabled = settings?.enabled ?? true;
+    if (!enabled) return;
+    showBubble(info);
+  });
+}
+
 // ---------- Event Handlers ----------
 
 function handleMouseUp(e: MouseEvent) {
   // Ignore clicks inside the bubble
   if (isInsideBubble(e.target)) return;
 
+  // Only trigger on text selection in 'select' mode
+  if (triggerMode !== 'select') return;
+
   if (debounceTimer) clearTimeout(debounceTimer);
 
   debounceTimer = setTimeout(() => {
     const info = getSelectionInfo();
     if (info) {
-      // Check if extension is enabled before showing
-      chrome.storage.local.get('settings', (result) => {
-        const settings = result.settings;
-        // If settings have not been initialized yet, default to enabled
-        const enabled = settings?.enabled ?? true;
-        if (!enabled) return;
-
-        showBubble(info);
-      });
+      tryShowBubble(info);
     }
   }, DEBOUNCE_MS);
+}
+
+function handleDblClick(e: MouseEvent) {
+  if (isInsideBubble(e.target)) return;
+  if (triggerMode !== 'double-click') return;
+
+  // Small delay to let the browser finish selecting the double-clicked word
+  setTimeout(() => {
+    const info = getSelectionInfo();
+    if (info) {
+      tryShowBubble(info);
+    }
+  }, 50);
+}
+
+function handleHotkeyTrigger(e: KeyboardEvent) {
+  // Ctrl+Shift+T (or Cmd+Shift+T on Mac) to trigger translation of current selection
+  if (triggerMode !== 'hotkey') return;
+  if (!(e.ctrlKey || e.metaKey) || !e.shiftKey || e.key !== 'T') return;
+
+  e.preventDefault();
+  const info = getSelectionInfo();
+  if (info) {
+    tryShowBubble(info);
+  }
 }
 
 function handleMouseDown(e: MouseEvent) {
@@ -98,7 +130,10 @@ function handleMouseDown(e: MouseEvent) {
 function handleKeyDown(e: KeyboardEvent) {
   if (e.key === 'Escape' && currentSelection) {
     closeBubble();
+    return;
   }
+
+  handleHotkeyTrigger(e);
 }
 
 function handleScroll() {
@@ -122,15 +157,24 @@ function handleScroll() {
 // ---------- Bootstrap ----------
 
 function init() {
+  // Load initial trigger mode
+  chrome.storage.local.get('settings', (result) => {
+    triggerMode = result.settings?.triggerMode ?? DEFAULT_SETTINGS.triggerMode;
+  });
+
   document.addEventListener('mouseup', handleMouseUp, true);
+  document.addEventListener('dblclick', handleDblClick, true);
   document.addEventListener('mousedown', handleMouseDown, true);
   document.addEventListener('keydown', handleKeyDown, true);
   window.addEventListener('scroll', handleScroll, true);
 
-  // Listen for settings changes to close bubble if extension is disabled
+  // Listen for settings changes
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.settings?.newValue?.enabled === false) {
       closeBubble();
+    }
+    if (changes.settings?.newValue?.triggerMode) {
+      triggerMode = changes.settings.newValue.triggerMode;
     }
   });
 

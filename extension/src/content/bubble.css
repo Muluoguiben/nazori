@@ -191,6 +191,13 @@
   white-space: pre-wrap;
 }
 
+.nazori-term-highlight {
+  background: rgba(74, 144, 217, 0.15);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
 .nazori-translation-text .nazori-cursor {
   display: inline-block;
   width: 2px;
@@ -491,6 +498,10 @@
 
   .nazori-translation-text {
     color: #e0e0e0;
+  }
+
+  .nazori-term-highlight {
+    background: rgba(100, 181, 246, 0.2);
   }
 
   .nazori-dict-header {
