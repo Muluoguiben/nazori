@@ -27,6 +27,11 @@
 - [x] `CLAUDE.md` codebase guide for AI assistants
 - [x] E2E tests with Playwright (27 tests: popup, options, content script, lifecycle)
 - [x] Content script IIFE build (two-pass Vite build for cross-version Chrome compat)
+- [x] Translation mode selector (Quick/Normal/Refined) in Popup + Bubble
+- [x] Same-language detection — skip API call when source equals target
+- [x] Word/idiom dictionary mode — auto-detect short text, show pronunciation/meaning/usage
+- [x] Follow-up question input — ask AI to explain translation in Bubble
+- [x] Scroll-safe bubble — don't close during streaming on scroll
 
 ## Deploy & Verify
 
@@ -44,9 +49,9 @@
 ## v1.1 - Experience Polish
 
 - [ ] Add keyboard shortcut customization UI (currently only Alt+T, no UI to remap)
-- [ ] Font size setting wired to bubble UI (small/medium/large from Settings)
-- [ ] Double-click and hotkey trigger modes in SelectionHandler
-- [ ] Term highlighting in bubble translation text (showTermHighlight setting)
+- [x] Font size setting wired to bubble UI (small/medium/large from Settings)
+- [x] Double-click and hotkey trigger modes in SelectionHandler
+- [x] Term highlighting in bubble translation text (showTermHighlight setting)
 
 ## v2 - Advanced Features
 
