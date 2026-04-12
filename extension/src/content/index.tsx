@@ -104,20 +104,17 @@ function handleKeyDown(e: KeyboardEvent) {
 function handleScroll() {
   if (!currentSelection) return;
 
-  // Re-check whether the user's selection still exists
+  // Try to reposition the bubble to follow the selection.
+  // Never close the bubble on scroll — the user may still be reading
+  // a streaming translation. They can close it with Escape or click-away.
   const sel = window.getSelection();
-  const text = sel?.toString().trim();
-  if (!text || sel!.rangeCount === 0) {
-    closeBubble();
-    return;
-  }
+  if (!sel || sel.rangeCount === 0) return;
 
-  // Selection still exists — update the bubble position with the fresh rect
-  const rect = sel!.getRangeAt(0).getBoundingClientRect();
-  if (rect.width === 0 && rect.height === 0) {
-    closeBubble();
-    return;
-  }
+  const text = sel.toString().trim();
+  if (!text) return;
+
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  if (rect.width === 0 && rect.height === 0) return;
 
   showBubble({ text: currentSelection.text, rect });
 }
