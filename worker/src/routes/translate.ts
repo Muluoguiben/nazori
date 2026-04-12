@@ -118,6 +118,7 @@ export async function translateHandler(c: Context<AppEnv>) {
     detectedLang: '',
     matchedTerms: [],
     systemPrompt: '',
+    isWordLookup: false,
     draftText: '',
     refinePrompt: '',
     translatedText: '',
@@ -125,6 +126,37 @@ export async function translateHandler(c: Context<AppEnv>) {
     usage: { inputTokens: 0, outputTokens: 0 },
     error: undefined,
   });
+
+  // ── Same-language short-circuit ──────────────────────────────────────
+  if (preparedState.detectedLang === data.target_lang) {
+    const stream = new ReadableStream({
+      start(controller) {
+        const encoder = new TextEncoder();
+        const emit = (d: object) => {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(d)}\n\n`));
+        };
+        emit({ type: 'text_delta', text: data.text });
+        emit({
+          type: 'message_stop',
+          mode: data.mode,
+          modelUsed: 'none',
+          detectedLang: preparedState.detectedLang,
+          matchedTerms: preparedState.matchedTerms,
+          sameLanguage: true,
+          usage: { inputTokens: 0, outputTokens: 0 },
+        });
+        controller.close();
+      },
+    });
+    return new Response(stream, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      },
+    });
+  }
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -275,6 +307,7 @@ export async function translateHandler(c: Context<AppEnv>) {
         modelUsed,
         detectedLang: preparedState.detectedLang,
         matchedTerms: preparedState.matchedTerms,
+        isWordLookup: preparedState.isWordLookup,
         usage: { inputTokens: 0, outputTokens: 0 },
       });
       controller.close();
@@ -309,6 +342,39 @@ export async function translateFullHandler(c: Context<AppEnv>) {
 
   const { data } = result;
 
+  // ── Same-language short-circuit ──────────────────────────────────────
+  const prepState = await prepGraph.invoke({
+    text: data.text,
+    sourceLang: data.source_lang,
+    targetLang: data.target_lang,
+    domain: data.domain,
+    inputTerms: data.terms,
+    mode: data.mode,
+    geminiApiKey: '',
+    ai: null,
+    detectedLang: '',
+    matchedTerms: [],
+    systemPrompt: '',
+    isWordLookup: false,
+    draftText: '',
+    refinePrompt: '',
+    translatedText: '',
+    modelUsed: '',
+    usage: { inputTokens: 0, outputTokens: 0 },
+    error: undefined,
+  });
+
+  if (prepState.detectedLang === data.target_lang) {
+    return c.json({
+      translatedText: data.text,
+      detectedLang: prepState.detectedLang,
+      matchedTerms: prepState.matchedTerms,
+      modelUsed: 'none',
+      sameLanguage: true,
+      usage: { inputTokens: 0, outputTokens: 0 },
+    });
+  }
+
   const finalState = await fullGraph.invoke({
     text: data.text,
     sourceLang: data.source_lang,
@@ -321,6 +387,7 @@ export async function translateFullHandler(c: Context<AppEnv>) {
     detectedLang: '',
     matchedTerms: [],
     systemPrompt: '',
+    isWordLookup: false,
     draftText: '',
     refinePrompt: '',
     translatedText: '',

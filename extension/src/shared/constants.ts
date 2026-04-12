@@ -41,6 +41,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enabled: true,
   defaultTargetLang: 'en',
   defaultDomain: 'general',
+  defaultMode: 'normal',
   theme: 'system',
   fontSize: 'medium',
   triggerMode: 'select',

@@ -44,6 +44,10 @@ export type MessageType =
   | 'TRANSLATE_STREAM_REFINE_START'
   | 'TRANSLATE_STREAM_END'
   | 'TRANSLATE_ERROR'
+  | 'EXPLAIN_REQUEST'
+  | 'EXPLAIN_STREAM_CHUNK'
+  | 'EXPLAIN_STREAM_END'
+  | 'EXPLAIN_ERROR'
   | 'TERMS_GET'
   | 'TERMS_ADD'
   | 'TERMS_DELETE'
@@ -77,6 +81,7 @@ export interface Settings {
   enabled: boolean;
   defaultTargetLang: LangCode;
   defaultDomain: Domain;
+  defaultMode: TranslateMode;
   theme: 'light' | 'dark' | 'system';
   fontSize: 'small' | 'medium' | 'large';
   triggerMode: 'select' | 'double-click' | 'hotkey';

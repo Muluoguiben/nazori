@@ -25,9 +25,18 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
   const [isStreaming, setIsStreaming] = useState(false);
   const [mode, setMode] = useState<TranslateMode>('normal');
   const [isRefining, setIsRefining] = useState(false);
+  const [isWordLookup, setIsWordLookup] = useState(false);
+
+  // Follow-up explain
+  const [explainQuestion, setExplainQuestion] = useState('');
+  const [explainText, setExplainText] = useState('');
+  const [isExplaining, setIsExplaining] = useState(false);
+  const [explainError, setExplainError] = useState<string | null>(null);
+  const [explainStreaming, setExplainStreaming] = useState(false);
 
   const bubbleRef = useRef<HTMLDivElement>(null);
   const portRef = useRef<chrome.runtime.Port | null>(null);
+  const explainPortRef = useRef<chrome.runtime.Port | null>(null);
   const requestIdRef = useRef<string>('');
   const targetLangRef = useRef(targetLang);
   const domainRef = useRef(domain);
@@ -63,6 +72,7 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
       if (s) {
         if (s.defaultTargetLang) setTargetLang(s.defaultTargetLang);
         if (s.defaultDomain) setDomain(s.defaultDomain);
+        if (s.defaultMode) setMode(s.defaultMode);
       }
     });
   }, []);
@@ -81,6 +91,7 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
     setIsLoading(true);
     setIsStreaming(false);
     setIsRefining(false);
+    setIsWordLookup(false);
 
     const port = chrome.runtime.connect({ name: 'translate-stream' });
     portRef.current = port;
@@ -135,11 +146,13 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
           const payload = msg.payload as {
             matchedTerms?: { source: string; target: string }[];
             detectedLang?: LangCode;
+            isWordLookup?: boolean;
           };
           setIsLoading(false);
           setIsStreaming(false);
           if (payload.matchedTerms) setMatchedTerms(payload.matchedTerms);
           if (payload.detectedLang) setDetectedLang(payload.detectedLang);
+          if (payload.isWordLookup) setIsWordLookup(true);
           break;
         }
         case 'TRANSLATE_ERROR': {
@@ -214,6 +227,112 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
       setTimeout(() => setCopied(false), 1500);
     }
   }, [translatedText]);
+
+  // ---------- Dictionary section renderer ----------
+  const renderDictSections = (text: string) => {
+    const HEADERS = ['Translation', 'Pronunciation', 'Meaning', 'Usage'];
+    const regex = /\[(Translation|Pronunciation|Meaning|Usage)\]\n?/g;
+    const parts: { header: string; body: string }[] = [];
+    let lastIndex = 0;
+    let lastHeader = '';
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (lastHeader) {
+        parts.push({ header: lastHeader, body: text.slice(lastIndex, match.index).trim() });
+      }
+      lastHeader = match[1];
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastHeader) {
+      parts.push({ header: lastHeader, body: text.slice(lastIndex).trim() });
+    }
+
+    // If no sections parsed (streaming in progress), fall back to plain text
+    if (parts.length === 0) return text;
+
+    return parts.map((p, i) => (
+      <div key={i} className="nazori-dict-section">
+        <div className="nazori-dict-header">{p.header}</div>
+        <div className="nazori-dict-body">{p.body}</div>
+      </div>
+    ));
+  };
+
+  // ---------- Explain (follow-up question) ----------
+  const sendExplainQuestion = useCallback(() => {
+    const q = explainQuestion.trim();
+    if (!q || !translatedText) return;
+
+    // Clean up previous port
+    if (explainPortRef.current) {
+      try { explainPortRef.current.disconnect(); } catch { /* noop */ }
+    }
+
+    setExplainText('');
+    setExplainError(null);
+    setIsExplaining(true);
+    setExplainStreaming(false);
+
+    const port = chrome.runtime.connect({ name: 'explain-stream' });
+    explainPortRef.current = port;
+
+    const reqId = nanoid();
+
+    const message: Message = {
+      type: 'EXPLAIN_REQUEST',
+      payload: {
+        originalText: sourceText,
+        translatedText,
+        question: q,
+        targetLang: targetLangRef.current,
+      },
+      requestId: reqId,
+      timestamp: Date.now(),
+    };
+
+    port.postMessage(message);
+
+    port.onMessage.addListener((msg: Message) => {
+      if (msg.requestId !== reqId) return;
+
+      switch (msg.type) {
+        case 'EXPLAIN_STREAM_CHUNK': {
+          const payload = msg.payload as { text: string };
+          setIsExplaining(false);
+          setExplainStreaming(true);
+          setExplainText((prev) => prev + payload.text);
+          break;
+        }
+        case 'EXPLAIN_STREAM_END': {
+          setIsExplaining(false);
+          setExplainStreaming(false);
+          break;
+        }
+        case 'EXPLAIN_ERROR': {
+          const payload = msg.payload as { message?: string };
+          setIsExplaining(false);
+          setExplainStreaming(false);
+          setExplainError(payload.message ?? 'Failed to get explanation');
+          break;
+        }
+      }
+    });
+
+    port.onDisconnect.addListener(() => {
+      explainPortRef.current = null;
+    });
+  }, [explainQuestion, translatedText, sourceText]);
+
+  // Clean up explain port on unmount
+  useEffect(() => {
+    return () => {
+      if (explainPortRef.current) {
+        try { explainPortRef.current.disconnect(); } catch { /* noop */ }
+        explainPortRef.current = null;
+      }
+    };
+  }, []);
 
   // ---------- Truncated source ----------
   const truncatedSource =
@@ -344,7 +463,7 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
 
         {translatedText && (
           <div className="nazori-translation-text">
-            {translatedText}
+            {isWordLookup ? renderDictSections(translatedText) : translatedText}
             {isStreaming && <span className="nazori-cursor" aria-hidden="true" />}
           </div>
         )}
@@ -388,6 +507,55 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Follow-up question */}
+      {translatedText && !error && !isStreaming && (
+        <div className="nazori-explain-section">
+          <div className="nazori-explain-input-row">
+            <input
+              className="nazori-explain-input"
+              type="text"
+              placeholder="Ask a follow-up question..."
+              value={explainQuestion}
+              onChange={(e) => setExplainQuestion(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !(e.nativeEvent as KeyboardEvent).isComposing) {
+                  e.preventDefault();
+                  sendExplainQuestion();
+                }
+                e.stopPropagation();
+              }}
+              disabled={isExplaining || explainStreaming}
+              aria-label="Follow-up question"
+            />
+            <button
+              className="nazori-explain-send"
+              onClick={sendExplainQuestion}
+              disabled={!explainQuestion.trim() || isExplaining || explainStreaming}
+              aria-label="Send question"
+            >
+              &#x27A4;
+            </button>
+          </div>
+
+          {isExplaining && !explainText && (
+            <div className="nazori-explain-loading">Thinking&#x2026;</div>
+          )}
+
+          {explainError && (
+            <div className="nazori-error" role="alert">
+              <span className="nazori-error-message">{explainError}</span>
+            </div>
+          )}
+
+          {explainText && (
+            <div className="nazori-explain-text">
+              {explainText}
+              {explainStreaming && <span className="nazori-cursor" aria-hidden="true" />}
+            </div>
+          )}
         </div>
       )}
     </div>

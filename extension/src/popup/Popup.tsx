@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import type { Settings, TranslationRecord, LangCode, Domain } from '../shared/types';
-import { LANGUAGES, DOMAINS, DOMAIN_LABELS, DEFAULT_SETTINGS } from '../shared/constants';
+import type { Settings, TranslationRecord, LangCode, Domain, TranslateMode } from '../shared/types';
+import { LANGUAGES, DOMAINS, DOMAIN_LABELS, TRANSLATE_MODES, MODE_LABELS, DEFAULT_SETTINGS } from '../shared/constants';
 import './popup.css';
 
 function Popup() {
@@ -122,6 +122,21 @@ function Popup() {
             {DOMAINS.map((d) => (
               <option key={d} value={d}>
                 {DOMAIN_LABELS[d]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="setting-row">
+          <label htmlFor="mode">Mode</label>
+          <select
+            id="mode"
+            value={settings.defaultMode ?? 'normal'}
+            onChange={(e) => updateSetting('defaultMode', e.target.value as TranslateMode)}
+          >
+            {TRANSLATE_MODES.map((m) => (
+              <option key={m} value={m}>
+                {MODE_LABELS[m]}
               </option>
             ))}
           </select>
