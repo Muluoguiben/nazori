@@ -166,6 +166,31 @@
   white-space: pre-wrap;
 }
 
+/* --- Word lookup dictionary sections --- */
+.nazori-dict-section {
+  margin-bottom: 6px;
+}
+
+.nazori-dict-section:last-child {
+  margin-bottom: 0;
+}
+
+.nazori-dict-header {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #4a90d9;
+  margin-bottom: 2px;
+}
+
+.nazori-dict-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  white-space: pre-wrap;
+}
+
 .nazori-translation-text .nazori-cursor {
   display: inline-block;
   width: 2px;
@@ -305,6 +330,89 @@
   color: #4a90d9;
 }
 
+/* --- Follow-up explain --- */
+.nazori-explain-section {
+  margin-top: 10px;
+  border-top: 1px solid #e8e8e8;
+  padding-top: 10px;
+}
+
+.nazori-explain-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.nazori-explain-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #333;
+  background: #fafafa;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.nazori-explain-input:focus {
+  border-color: #4a90d9;
+}
+
+.nazori-explain-input::placeholder {
+  color: #aaa;
+}
+
+.nazori-explain-input:disabled {
+  opacity: 0.6;
+}
+
+.nazori-explain-send {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #4a90d9;
+  border-radius: 6px;
+  background: #4a90d9;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.nazori-explain-send:hover {
+  background: #3a7bc8;
+}
+
+.nazori-explain-send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.nazori-explain-send:focus-visible {
+  outline: 2px solid #4a90d9;
+  outline-offset: 1px;
+}
+
+.nazori-explain-loading {
+  font-size: 13px;
+  color: #6b7280;
+  font-style: italic;
+  padding: 6px 0;
+}
+
+.nazori-explain-text {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+}
+
 /* --- Error state --- */
 .nazori-error {
   display: flex;
@@ -385,6 +493,14 @@
     color: #e0e0e0;
   }
 
+  .nazori-dict-header {
+    color: #64b5f6;
+  }
+
+  .nazori-dict-body {
+    color: #e0e0e0;
+  }
+
   .nazori-refining-hint {
     color: #9ca3af;
   }
@@ -433,6 +549,41 @@
 
   .nazori-term-target {
     color: #64b5f6;
+  }
+
+  .nazori-explain-section {
+    border-top-color: #333;
+  }
+
+  .nazori-explain-input {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #ddd;
+  }
+
+  .nazori-explain-input:focus {
+    border-color: #64b5f6;
+  }
+
+  .nazori-explain-input::placeholder {
+    color: #666;
+  }
+
+  .nazori-explain-send {
+    background: #3a7bc8;
+    border-color: #3a7bc8;
+  }
+
+  .nazori-explain-send:hover {
+    background: #4a90d9;
+  }
+
+  .nazori-explain-loading {
+    color: #9ca3af;
+  }
+
+  .nazori-explain-text {
+    color: #ddd;
   }
 
   .nazori-error {

@@ -23,6 +23,9 @@ export const TranslationState = Annotation.Root({
   matchedTerms: Annotation<{ source: string; target: string }[]>,
   systemPrompt: Annotation<string>,
 
+  // ── Word/idiom lookup ──────────────────────────────────────────────
+  isWordLookup: Annotation<boolean>,
+
   // ── Refined mode intermediate ──────────────────────────────────────
   draftText: Annotation<string>,
   refinePrompt: Annotation<string>,

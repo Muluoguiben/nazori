@@ -116,6 +116,26 @@ export async function matchTermsNode(
   return { matchedTerms: matched };
 }
 
+// ── Word / idiom detection ───────────────────────────────────────────
+
+const SENTENCE_ENDERS = /[.?!;。？！；…]/;
+const CJK_RANGE = /[\u4E00-\u9FFF\u3400-\u4DBF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g;
+
+function isWordOrIdiom(text: string): boolean {
+  const trimmed = text.trim();
+  if (!trimmed || SENTENCE_ENDERS.test(trimmed)) return false;
+
+  const cjkChars = trimmed.match(CJK_RANGE);
+  if (cjkChars && cjkChars.length > 0) {
+    // CJK-dominant: treat as word/idiom if ≤ 8 characters
+    return trimmed.length <= 8;
+  }
+
+  // Alphabetic: count words
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  return words.length <= 3;
+}
+
 // ── Node: Build Prompt ────────────────────────────────────────────────
 
 export async function buildPromptNode(
@@ -125,6 +145,35 @@ export async function buildPromptNode(
 
   const sourceLangLabel = detectedLang || 'auto-detected';
   const targetLangLabel = getTargetLanguageLabel(targetLang);
+
+  // ── Word / idiom lookup mode ──
+  const wordLookup = isWordOrIdiom(state.text);
+  if (wordLookup) {
+    const sourceLangName = getTargetLanguageLabel(detectedLang);
+    let system = `You are a dictionary and language expert. The user will give you a word, phrase, slang, or idiom in ${sourceLangName}.\n\n`;
+    system += `Respond in ${targetLangLabel} with this exact format:\n\n`;
+    system += `[Translation]\n`;
+    system += `The translation in ${targetLangLabel}\n\n`;
+    system += `[Pronunciation]\n`;
+    system += `IPA transcription for alphabetic languages, or pinyin/romaji/romanization for CJK languages. Include tone marks where applicable.\n\n`;
+    system += `[Meaning]\n`;
+    system += `A clear, concise definition. If the word has multiple meanings, list the top 2-3, numbered.\n\n`;
+    system += `[Usage]\n`;
+    system += `2-3 example sentences showing common usage. Each on its own line, numbered. Include ${targetLangLabel} translation in parentheses after each example.\n\n`;
+    system += `Rules:\n`;
+    system += `- Use the section headers exactly as shown: [Translation], [Pronunciation], [Meaning], [Usage]\n`;
+    system += `- Keep it concise and practical\n`;
+    system += `- If it is slang or an idiom, note that in the meaning section\n`;
+    if (targetLang === 'zh') system += '- Use Simplified Chinese\n';
+    if (targetLang === 'zh-Hant') system += '- Use Traditional Chinese\n';
+
+    if (matchedTerms && matchedTerms.length > 0) {
+      system += '\nGlossary:\n';
+      for (const t of matchedTerms) system += `  "${t.source}" -> "${t.target}"\n`;
+    }
+
+    return { systemPrompt: system, isWordLookup: true };
+  }
 
   // ── Quick mode: minimal prompt for speed ──
   if (mode === 'quick') {
