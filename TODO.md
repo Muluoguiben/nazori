@@ -30,16 +30,16 @@
 
 ## Deploy & Verify
 
-- [ ] Deploy Worker backend (`cd worker && npx wrangler login && npx wrangler deploy`)
-- [ ] Set Gemini API key (`npx wrangler secret put GEMINI_API_KEY`)
-- [ ] Update `API_BASE_URL` in `extension/src/shared/constants.ts` with real Worker URL
-- [ ] Rebuild extension (`cd extension && npm run build`)
-- [ ] Load `extension/dist/` in Chrome and verify end-to-end translation flow
-- [ ] Test streaming translation (typewriter effect)
-- [ ] Test term matching (switch to Legal/Medical/Tech domain)
-- [ ] Test Popup language/domain switching
-- [ ] Test Options page term CRUD and import/export
-- [ ] Verify Gemini → Workers AI fallback works when Gemini quota exhausted
+- [x] Deploy Worker backend (`cd worker && npx wrangler login && npx wrangler deploy`)
+- [x] Set Gemini API key (`npx wrangler secret put GEMINI_API_KEY`)
+- [x] Update `API_BASE_URL` in `extension/src/shared/constants.ts` with real Worker URL
+- [x] Rebuild extension (`cd extension && npm run build`)
+- [x] Load `extension/dist/` in Chrome and verify end-to-end translation flow
+- [x] Test streaming translation (typewriter effect)
+- [x] Test term matching (switch to Legal/Medical/Tech domain)
+- [x] Test Popup language/domain switching
+- [x] Test Options page term CRUD and import/export
+- [x] Verify Gemini → Workers AI fallback works when Gemini quota exhausted
 
 ## v1.1 - Experience Polish
 
