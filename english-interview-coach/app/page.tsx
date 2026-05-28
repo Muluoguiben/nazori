@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { InstallHint } from "./install-hint";
+import { StreakBadge } from "./streak";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
         <p className="mt-2 text-sm text-neutral-400">
           Explain one concept out loud. 90 seconds. Instant feedback.
         </p>
+        <StreakBadge />
       </header>
 
       <div className="flex flex-col items-center gap-4">

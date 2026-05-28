@@ -15,3 +15,9 @@ export const SELECT_RECENT_REPS = `SELECT
   FROM reps
   ORDER BY created_at DESC
   LIMIT $1`;
+
+export const SELECT_REP_DAYS = `SELECT created_at::date AS day, COUNT(*)::int AS n
+  FROM reps
+  GROUP BY day
+  ORDER BY day DESC
+  LIMIT 400`;

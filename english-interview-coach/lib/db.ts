@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
-import { INSERT_REP, INSERT_SKIP, SELECT_RECENT_REPS } from '@/db/queries.mjs';
+import { INSERT_REP, INSERT_SKIP, SELECT_RECENT_REPS, SELECT_REP_DAYS } from '@/db/queries.mjs';
+import { statsFromDays } from '@/lib/stats.mjs';
 import type { EvalResult, Scores } from './types';
 
 export function dbEnabled(): boolean {
@@ -56,4 +57,13 @@ export async function listRecentReps(limit = 20): Promise<RepRow[]> {
   if (!sql) return [];
   const rows = await sql.query(SELECT_RECENT_REPS, [limit]);
   return rows as unknown as RepRow[];
+}
+
+export type Stats = { streak: number; today: number; total: number };
+
+export async function getStats(): Promise<Stats> {
+  const sql = getSql();
+  if (!sql) return { streak: 0, today: 0, total: 0 };
+  const rows = (await sql.query(SELECT_REP_DAYS)) as unknown as { day: string; n: number }[];
+  return statsFromDays(rows);
 }

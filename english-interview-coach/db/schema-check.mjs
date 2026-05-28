@@ -3,7 +3,8 @@
 // Usage: node db/schema-check.mjs
 import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
-import { INSERT_REP, INSERT_SKIP, SELECT_RECENT_REPS } from './queries.mjs';
+import { INSERT_REP, INSERT_SKIP, SELECT_RECENT_REPS, SELECT_REP_DAYS } from './queries.mjs';
+import { statsFromDays } from '../lib/stats.mjs';
 
 const schema = await readFile(new URL('./schema.sql', import.meta.url), 'utf8');
 
@@ -40,11 +41,36 @@ const ok =
 const skips = await db.query('SELECT prompt_term FROM skipped_concepts');
 const skipOk = skips.rows.length === 1 && skips.rows[0].prompt_term === 'monads';
 
+// Streak: add reps on today, yesterday, and the day before (one rep already
+// exists for today from the insert above), then verify the streak query and
+// computation report 3 consecutive days.
+const now = new Date();
+const INSERT_REP_AT = `INSERT INTO reps
+  (prompt_term, prompt_text, transcript, duration_sec, scores, inline_correction, fixes, created_at)
+  VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7::jsonb, $8)`;
+for (const offset of [0, 1, 2]) {
+  const at = new Date(now);
+  at.setUTCDate(at.getUTCDate() - offset);
+  await db.query(INSERT_REP_AT, [
+    `term-${offset}`,
+    'p',
+    'transcript',
+    30,
+    JSON.stringify(scores),
+    'x',
+    JSON.stringify(fixes),
+    at.toISOString(),
+  ]);
+}
+const dayRows = await db.query(SELECT_REP_DAYS);
+const stats = statsFromDays(dayRows.rows, now);
+const streakOk = stats.streak === 3;
+
 await db.close();
 
-if (!ok || !skipOk) {
-  console.error('schema check FAILED', { row, skips: skips.rows });
+if (!ok || !skipOk || !streakOk) {
+  console.error('schema check FAILED', { row, skips: skips.rows, stats });
   process.exit(1);
 }
 
-console.log('schema check OK — insert + query round-trip verified (reps + skipped_concepts).');
+console.log('schema check OK — reps + skipped_concepts round-trip and streak =', stats.streak);

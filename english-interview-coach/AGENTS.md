@@ -8,20 +8,25 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 A phone-first PWA to practice explaining tech concepts out loud in English, for mid-level full-stack + AI/Agent job interviews. Solo use.
 
-## What's done
+## What's done (v0 build complete)
 
-- **Spec:** `spec.md` (10 v0 design decisions locked 2026-05-27). Read this first. HTML view at `spec.html`.
-- **Curriculum:** `curriculum/week1.md` through `week6.md`. ~390 terms total. Format: simple definition (≤15 words B1), collocations, example, difficulty 1–3, interview use.
+- **Spec:** `spec.md` (10 v0 design decisions locked 2026-05-27). HTML view at `spec.html`.
+- **Curriculum:** `curriculum/week1.md`–`week3.md` (week 4–6 to come). `prompts.json` has 20 Week 1 prompts.
+- **App:** Next.js 16 (App Router) + React 19 + Tailwind v4 PWA.
+  1. `prompts.json` from Week 1 — done.
+  2. PWA scaffold — manifest, icons, service worker (`app/`, `public/`).
+  3. Happy-path rep — `/rep`: 90s record → Whisper (`/api/transcribe`) → Claude Sonnet 4.6 (`/api/evaluate`, cached rubric + json_schema) → feedback.
+  4. Neon Postgres — `db/schema.sql` (`reps`, `skipped_concepts`), `lib/db.ts`, `/api/skip`, `/api/history`, `scripts/migrate.mjs`.
+  5. Shared-secret cookie auth — `middleware.ts`, `/login`, `/api/login` (`APP_SECRET`).
+  6. Streak counter — `/api/stats`, shown on the home screen.
 
-## What's next, in priority order
+Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gracefully, and `DEMO_MODE=1` runs the full flow with canned data. Verify with `npm run build`, `npm run lint`, `npm run test:e2e`, `npm run db:check`.
 
-1. **Filter Week 1 → `prompts.json`** — pick ~20 concept-level terms from `curriculum/week1.md` (skip syntax-level ones like "spread operator"). Format: `{ term, prompt, tag }`.
-2. **Scaffold Next.js PWA** — App Router + Tailwind + manifest. Mobile-first. Confirm it installs to phone home screen.
-3. **Build the one happy-path rep** — tap to start → 90s countdown → MediaRecorder → Whisper STT → Claude Sonnet 4.6 evaluate → render feedback. No DB yet.
-4. **Add Neon Postgres + schema** — one `reps` table, one `skipped_concepts` table. See spec for columns.
-5. **Shared-secret cookie middleware + Vercel deploy.**
+## What's left
 
-Build estimate: 15–20 hours focused work.
+- **Deploy to Vercel:** set the project root to `english-interview-coach`; add env `APP_SECRET`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL`; run `npm run db:migrate` once. See `.env.example`.
+- **Week 4–6 prompts** when the curriculum lands.
+- Deferred to v1+ (do not scope-creep into v0): mock interview mode, reference answers, progress trends.
 
 ## Design principles (do not violate)
 
@@ -41,10 +46,14 @@ Build estimate: 15–20 hours focused work.
 ## Key file paths
 
 ```
-spec.md                       v0 design (read first)
-spec.html                     rendered version
-curriculum/week{1..6}.md      vocab content
-prompts.json                  (to be created from week1.md)
+spec.md                  v0 design (read first)
+prompts.json             20 Week 1 prompts (term, prompt, tag)
+curriculum/week{1..3}.md vocab content (4-6 to come)
+app/                     App Router: home, /rep, /login, /api/*
+lib/                     db, auth, prompts, stats, types
+db/                      schema.sql, migrate + check scripts
+middleware.ts            shared-secret auth gate
+.env.example             required env vars
 ```
 
 ## Identity / publishing rules
