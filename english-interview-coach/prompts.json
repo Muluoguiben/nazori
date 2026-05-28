@@ -1,0 +1,102 @@
+[
+  {
+    "term": "closure",
+    "prompt": "Explain closure in 60 seconds, with an example of when you would use one.",
+    "tag": "js-core"
+  },
+  {
+    "term": "hoisting",
+    "prompt": "Explain hoisting in 60 seconds. Mention what is different between var, let, and function declarations.",
+    "tag": "js-core"
+  },
+  {
+    "term": "this binding",
+    "prompt": "Explain how `this` is bound in JavaScript. Mention arrow functions vs regular functions.",
+    "tag": "js-core"
+  },
+  {
+    "term": "prototype chain",
+    "prompt": "Explain the prototype chain in 60 seconds, with an example lookup.",
+    "tag": "js-core"
+  },
+  {
+    "term": "lexical scope",
+    "prompt": "Explain lexical scope in 60 seconds. Why does it matter for closures?",
+    "tag": "js-core"
+  },
+  {
+    "term": "immutability",
+    "prompt": "Explain immutability in 60 seconds. Why does it matter in React state?",
+    "tag": "js-core"
+  },
+  {
+    "term": "event loop",
+    "prompt": "Walk me through what the event loop does, in 60 seconds.",
+    "tag": "async"
+  },
+  {
+    "term": "race condition",
+    "prompt": "Explain race condition in 60 seconds, with a real example.",
+    "tag": "async"
+  },
+  {
+    "term": "Promise",
+    "prompt": "Explain a Promise in 60 seconds. What states can it be in?",
+    "tag": "async"
+  },
+  {
+    "term": "async/await",
+    "prompt": "Explain async/await in 60 seconds. How does it differ from chaining .then()?",
+    "tag": "async"
+  },
+  {
+    "term": "Promise.all",
+    "prompt": "Explain Promise.all in 60 seconds. When would you use it instead of sequential awaits?",
+    "tag": "async"
+  },
+  {
+    "term": "microtask vs macrotask",
+    "prompt": "Compare microtasks and macrotasks. Which one runs first and why?",
+    "tag": "async"
+  },
+  {
+    "term": "throttle vs debounce",
+    "prompt": "Compare throttle and debounce. When would you use each one?",
+    "tag": "async"
+  },
+  {
+    "term": "concurrency vs parallelism",
+    "prompt": "Compare concurrency and parallelism. Does JavaScript have one, both, or neither?",
+    "tag": "async"
+  },
+  {
+    "term": "generic",
+    "prompt": "Explain TypeScript generics in 60 seconds, with an example of a generic function.",
+    "tag": "ts-types"
+  },
+  {
+    "term": "narrowing",
+    "prompt": "Explain type narrowing in TypeScript. Give one example using a type guard.",
+    "tag": "ts-types"
+  },
+  {
+    "term": "discriminated union",
+    "prompt": "Explain discriminated unions in TypeScript. Why are they useful?",
+    "tag": "ts-types"
+  },
+  {
+    "term": "unknown vs any",
+    "prompt": "Compare `unknown` and `any` in TypeScript. When would you use `unknown`?",
+    "tag": "ts-types"
+  },
+  {
+    "term": "pure function",
+    "prompt": "Explain pure function in 60 seconds. Why does React care about purity?",
+    "tag": "functions"
+  },
+  {
+    "term": "memoization",
+    "prompt": "Explain memoization in 60 seconds. When is it worth doing?",
+    "tag": "functions"
+  }
+]
