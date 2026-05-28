@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import type { EvalResult } from '@/lib/types';
+import { saveRep } from '@/lib/db';
 
 export const runtime = 'nodejs';
 
@@ -60,10 +61,12 @@ function demoEval(transcript: string, wpm: number): EvalResult {
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
+    promptTerm?: string;
     promptText?: string;
     transcript?: string;
     durationSec?: number;
   };
+  const promptTerm = body.promptTerm ?? '';
   const promptText = body.promptText ?? '';
   const transcript = body.transcript ?? '';
   const durationSec = body.durationSec ?? 0;
@@ -110,6 +113,14 @@ export async function POST(request: Request) {
     }
     const parsed = JSON.parse(textBlock.text) as EvalResult;
     parsed.scores.pace_wpm = wpm; // trust the server-computed pace
+
+    // Persistence is best-effort: a DB hiccup must not block the feedback.
+    try {
+      await saveRep({ promptTerm, promptText, transcript, durationSec, result: parsed });
+    } catch (err) {
+      console.error('Failed to persist rep:', err);
+    }
+
     return NextResponse.json(parsed);
   } catch (err) {
     return NextResponse.json(

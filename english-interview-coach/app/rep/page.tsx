@@ -88,7 +88,12 @@ export default function RepPage() {
         const eRes = await fetch('/api/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ promptText: current.prompt, transcript: tx, durationSec }),
+          body: JSON.stringify({
+            promptTerm: current.term,
+            promptText: current.prompt,
+            transcript: tx,
+            durationSec,
+          }),
         });
         if (!eRes.ok) {
           const e = await eRes.json().catch(() => ({}));
@@ -156,6 +161,18 @@ export default function RepPage() {
     setPhase('idle');
   }, [clearTimers, stopStream]);
 
+  const skipConcept = useCallback(() => {
+    const term = prompt?.term;
+    if (term) {
+      void fetch('/api/skip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ term }),
+      }).catch(() => {});
+    }
+    nextPrompt();
+  }, [prompt, nextPrompt]);
+
   useEffect(
     () => () => {
       clearTimers();
@@ -196,7 +213,7 @@ export default function RepPage() {
             </button>
             <button
               type="button"
-              onClick={nextPrompt}
+              onClick={skipConcept}
               className="text-sm text-neutral-500 hover:text-neutral-300"
             >
               Skip this concept
