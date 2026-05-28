@@ -12,11 +12,11 @@ test.describe('home screen', () => {
     ).toBeVisible();
   });
 
-  test('shows a disabled Start session button (rep flow not built yet)', async ({ page }) => {
+  test('links Start session to the rep screen', async ({ page }) => {
     await page.goto('/');
-    const start = page.getByRole('button', { name: 'Start session' });
+    const start = page.getByRole('link', { name: 'Start session' });
     await expect(start).toBeVisible();
-    await expect(start).toBeDisabled();
+    await expect(start).toHaveAttribute('href', '/rep');
   });
 
   test('hides the iOS install hint on a desktop browser', async ({ page }) => {

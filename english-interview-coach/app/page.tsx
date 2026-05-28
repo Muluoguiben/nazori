@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { InstallHint } from "./install-hint";
 
 export default function Home() {
@@ -36,16 +37,12 @@ export default function Home() {
       </div>
 
       <div className="w-full">
-        <button
-          type="button"
-          disabled
-          className="w-full rounded-2xl bg-blue-600 px-6 py-4 text-base font-medium text-white shadow-lg shadow-blue-600/20 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        <Link
+          href="/rep"
+          className="block w-full rounded-2xl bg-blue-600 px-6 py-4 text-center text-base font-medium text-white shadow-lg shadow-blue-600/20 transition active:scale-[0.99]"
         >
           Start session
-        </button>
-        <p className="mt-3 text-center text-xs text-neutral-600">
-          Recording and feedback arrive in the next build step.
-        </p>
+        </Link>
         <InstallHint />
       </div>
     </main>
