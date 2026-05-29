@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>English Interview Coach — v0 Spec</title>
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --muted: #6b7280;
+    --bg: #ffffff;
+    --code-bg: #f4f4f5;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #e5e7eb;
+      --muted: #9ca3af;
+      --bg: #0f1115;
+      --code-bg: #1c1f26;
+      --border: #2a2f3a;
+      --accent: #60a5fa;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans", sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  h1 { font-size: 2em; margin: 0 0 8px; line-height: 1.25; }
+  h2 { font-size: 1.5em; margin: 40px 0 12px; padding-top: 16px; border-top: 1px solid var(--border); line-height: 1.3; }
+  h3 { font-size: 1.15em; margin: 24px 0 8px; }
+  p { margin: 0 0 12px; }
+  a { color: var(--accent); }
+  hr { display: none; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.9em;
+    background: var(--code-bg);
+    padding: 2px 5px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; font-size: 0.88em; }
+  ul, ol { padding-left: 24px; margin: 0 0 12px; }
+  li { margin-bottom: 4px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0 24px;
+    font-size: 0.95em;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--code-bg); font-weight: 600; }
+  strong { font-weight: 600; }
+  .meta {
+    color: var(--muted);
+    font-size: 0.85em;
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<h1>English Interview Coach — v0 Spec</h1>
+<p>A phone-first PWA that helps a mid-level full-stack engineer practice explaining technical concepts in English for job interviews, focused on AI/Agent roles.</p>
+<p>This document captures the v0 design — the result of a structured grill on 2026-05-27.</p>
+<hr>
+<h2>Goal</h2>
+<p>After 6 weeks of daily use, the user can confidently explain any topic from the curriculum out loud in English, in 60–90 seconds, with correct domain terms and few filler words.</p>
+<h2>Why this is needed</h2>
+<p>User is a 3–4 year full-stack engineer actively searching for AI Agent roles for 2026. Strong reading/writing English; weak speaking. No existing app targets tech-interview English at the concept-explanation level.</p>
+<hr>
+<h2>Scope</h2>
+<h3>In v0</h3>
+<ul>
+<li>One mode: <strong>Explanation reps</strong> — App shows a prompt (&quot;Explain <code>closure</code> in 60s&quot;), user speaks, app gives feedback.</li>
+<li>Curriculum: Week 1 only at launch (JS/TS/Async, 65 terms drafted; ~20 used as prompts after filtering to concept-level).</li>
+</ul>
+<h3>Out of v0 (deferred to v1+)</h3>
+<ul>
+<li>Mock interview mode (multi-turn, follow-up questions, interviewer voice)</li>
+<li>Quick mode (flashcards, vocab drills) — using Anki instead</li>
+<li>Reference answers (we use freestyle judgment first; add references if scoring drifts)</li>
+<li>Audio storage and playback</li>
+<li>Progress trend analytics</li>
+</ul>
+<hr>
+<h2>Design principles</h2>
+<ol>
+<li><strong>Two-mode split for daily routine.</strong> Silent work (vocab, flashcards) and loud work (speaking) happen at different times and places. Don&#39;t force them into one slot.</li>
+<li><strong>The Whisper transcript is the listener&#39;s experience.</strong> No transcript-editing step. If Whisper mishears you, that&#39;s a real signal about your pronunciation — same as it would be with a human interviewer.</li>
+<li><strong>Concise answers under time pressure</strong> is a feature, not a constraint. The 90s hard cap trains the right interview muscle.</li>
+<li><strong>Habit science over feature completeness.</strong> Open-ended sessions, low daily threshold (1 rep = streak), no all-or-nothing failure modes.</li>
+</ol>
+<hr>
+<h2>v0 design decisions (locked)</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Decision</th>
+<th>Choice</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Daily routine</td>
+<td>Two-mode split: Quick (silent, anywhere) + Deep (speaking, home)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Quick mode</td>
+<td>Use Anki (free on Android). Build Deep only.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Deep v0 scope</td>
+<td>Explanation reps only. Mock interview is v1.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Feedback format</td>
+<td>Transcript with inline corrections + 3 specific fixes</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Audio UX</td>
+<td>Tap to start, 90s hard limit, auto-submit</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Prompt source</td>
+<td>Auto-generated from <code>week1.md</code> (filter to concept-level terms); show term + question together</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Session length</td>
+<td>Open-ended with skip button. Streak = 1 completed rep/day</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Stack</td>
+<td>Next.js + Neon Postgres, shared-secret cookie, no audio storage</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Evaluation</td>
+<td>Freestyle judgment with cached rubric (Claude Sonnet 4.6)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Transcript review</td>
+<td>Auto-submit, no review step</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Daily UX</h2>
+<h3>Quick mode (Anki, separately)</h3>
+<ul>
+<li>10–20 cards/day from a deck built from <code>week1.md</code></li>
+<li>Done on phone, anywhere, silently</li>
+<li>~5–10 minutes</li>
+</ul>
+<h3>Deep mode (this app)</h3>
+<ul>
+<li>One fixed evening slot, at home</li>
+<li>Open PWA → tap &quot;Start&quot; → see prompt:<pre><code>closure
+Explain closure in 60 seconds as if to a senior engineer.
+</code></pre>
+</li>
+<li>Tap mic button → 90s countdown begins → speak</li>
+<li>At 90s: auto-stop, audio uploads, Whisper transcribes, Claude evaluates</li>
+<li>Feedback shows on screen:<ul>
+<li>Scores: Accuracy / Structure / Language / Pace (wpm)</li>
+<li>Inline-corrected transcript with <code>**fixes**</code> highlighted</li>
+<li>3 specific fixes (e.g., &quot;Use &#39;captures&#39; instead of &#39;remembers&#39; for tech audience&quot;)</li>
+</ul>
+</li>
+<li>Tap &quot;Next&quot; → next random prompt, or &quot;Skip&quot; if unfamiliar concept (doesn&#39;t count toward streak)</li>
+<li>Tap &quot;End session&quot; whenever — at least 1 completed rep keeps streak alive</li>
+</ul>
+<hr>
+<h2>Architecture</h2>
+<h3>Stack</h3>
+<ul>
+<li><strong>Frontend:</strong> Next.js (App Router) + Tailwind, mobile-first PWA</li>
+<li><strong>API:</strong> Next.js route handlers</li>
+<li><strong>DB:</strong> Neon Postgres</li>
+<li><strong>STT:</strong> OpenAI Whisper API (server-side)</li>
+<li><strong>LLM:</strong> Claude Sonnet 4.6 (<code>claude-sonnet-4-6</code>), with prompt caching on the system rubric</li>
+<li><strong>Auth:</strong> Shared-secret cookie. <code>APP_SECRET</code> env var on Vercel. First visit on a device asks for the secret once; sets a long-lived cookie.</li>
+<li><strong>Hosting:</strong> Vercel (free tier)</li>
+</ul>
+<h3>Data model (minimal)</h3>
+<pre><code class="language-sql">CREATE TABLE reps (
+  id            SERIAL PRIMARY KEY,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  prompt_term   TEXT NOT NULL,
+  prompt_text   TEXT NOT NULL,
+  transcript    TEXT NOT NULL,
+  duration_sec  INTEGER NOT NULL,
+  scores        JSONB NOT NULL,   -- { accuracy, structure, language, pace_wpm }
+  inline_correction TEXT NOT NULL, -- markdown with **fixes** highlighted
+  fixes         JSONB NOT NULL    -- [string, string, string]
+);
+
+CREATE TABLE skipped_concepts (
+  id            SERIAL PRIMARY KEY,
+  skipped_at    TIMESTAMPTZ DEFAULT NOW(),
+  prompt_term   TEXT NOT NULL
+);
+</code></pre>
+<p>No user_id (solo app). No prompts table — prompts live in <code>prompts.json</code> in the repo.</p>
+<h3>Audio flow</h3>
+<ol>
+<li>Browser records via MediaRecorder API (Opus codec)</li>
+<li>On stop, upload blob to <code>/api/transcribe</code></li>
+<li>Server calls Whisper API</li>
+<li>Server calls Claude with prompt + transcript</li>
+<li>Server inserts row into <code>reps</code></li>
+<li>Server returns evaluation JSON to client</li>
+<li>Client renders feedback screen</li>
+</ol>
+<p>Audio blob is <strong>not persisted</strong> anywhere.</p>
+<hr>
+<h2>Evaluation design</h2>
+<h3>System prompt (cached)</h3>
+<pre><code>You are an English speaking coach for technical job interviews.
+Grade spoken explanations on a 1–10 scale across:
+- Accuracy: Does the explanation match the concept correctly?
+- Structure: Does it go intro → mechanism → tradeoff/example?
+- Language: Grammar, word choice, vocabulary appropriate for senior audience
+- Pace: target 110–150 wpm
+
+Return strict JSON only. Be specific in fixes — quote the user&#39;s actual words.
+</code></pre>
+<h3>User message (per rep)</h3>
+<pre><code>Prompt: {prompt_text}
+Transcript: {transcript}
+Duration: {duration_sec}s
+Word count: {n}
+WPM: {n / duration_sec * 60}
+
+Return:
+{
+  &quot;scores&quot;: { &quot;accuracy&quot;: int, &quot;structure&quot;: int, &quot;language&quot;: int, &quot;pace_wpm&quot;: int },
+  &quot;inline_correction&quot;: &quot;&lt;markdown with **fixes**&gt;&quot;,
+  &quot;fixes&quot;: [&quot;fix 1&quot;, &quot;fix 2&quot;, &quot;fix 3&quot;]
+}
+</code></pre>
+<h3>Cost estimate</h3>
+<ul>
+<li>~500 input + 500 output tokens per rep</li>
+<li>Sonnet 4.6: ~$0.009 per rep</li>
+<li>5 reps/day × 30 days = ~$1.35/month</li>
+<li>Whisper API: ~$0.006 per 60s clip</li>
+<li>Total: ~$2–3/month all-in</li>
+</ul>
+<hr>
+<h2>Build plan</h2>
+<p>Estimated total: <strong>15–20 hours focused work</strong>, realistic over 2–3 weekends.</p>
+<pre><code>1. Next.js PWA scaffold + Tailwind + manifest      → verify: installs to phone home screen
+2. Shared-secret cookie middleware                  → verify: blocks visitors without secret
+3. Neon Postgres + schema migration                 → verify: can insert + query a row
+4. prompts.json (filter ~20 concepts from week1.md) → verify: prompt list loads in app
+5. Main screen + &quot;Start session&quot; button             → verify: looks clean on iPhone Safari
+6. Rep screen: prompt display + mic button + 90s timer + countdown → verify: timer auto-stops
+7. MediaRecorder → /api/transcribe → Whisper        → verify: 60s of my speech transcribes
+8. /api/evaluate → Claude Sonnet 4.6 with cached system prompt → verify: returns valid scored JSON
+9. Feedback screen: render scores + inline-corrected transcript + 3 fixes → verify: readable on phone
+10. Streak counter (today&#39;s completed reps)          → verify: increments on completion, ignores skips
+11. Deploy to Vercel + Neon connection              → verify: works from phone PWA, multi-device sync
+</code></pre>
+<h3>v0 ship criteria</h3>
+<ul>
+<li>Open PWA on iPhone Safari → installable to home screen</li>
+<li>Tap Start → tap mic → talk for 60s → see real Claude evaluation feedback</li>
+<li>Repeat across iPhone, Mac, Windows; all reps appear in same history</li>
+<li>3 consecutive days of real use without crashes</li>
+</ul>
+<hr>
+<h2>Future scope (v1+)</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Adds</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v0.1</td>
+<td>Streak deprioritization for skipped concepts</td>
+</tr>
+<tr>
+<td>v0.5</td>
+<td>Reference answers (Method B from Q9) for prompts with inconsistent scoring</td>
+</tr>
+<tr>
+<td>v1.0</td>
+<td>Mock interview mode: multi-turn, follow-up questions, interviewer TTS voice, feedback at session end</td>
+</tr>
+<tr>
+<td>v1.5</td>
+<td>Progress trends: weekly score deltas, retention rate per concept</td>
+</tr>
+<tr>
+<td>v2.0</td>
+<td>Fold vocab/flashcards back into the app (replace Anki dependency)</td>
+</tr>
+<tr>
+<td>v2.0</td>
+<td>LLM-generated prompts (Method C from Q6) for topic variety</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Open items (next grill)</h2>
+<p>Not yet decided. To resolve before or during build:</p>
+<ul>
+<li>Error UX: what shows when Whisper API errors? When Claude API errors? Mic permission denied?</li>
+<li>Onboarding: what does first-ever visit look like? (Set secret, do a test rep?)</li>
+<li>Visual design: color palette, typography, dark mode</li>
+<li>Prompt curation: which ~20 of the 65 week1 terms become Deep mode prompts?</li>
+<li>Week 2+ content: React, system design, LLM/agents — to be drafted closer to needed</li>
+</ul>
+<hr>
+<h2>Appendix — curriculum overview</h2>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Topic</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>JavaScript / TypeScript / Async</td>
+<td>65 vocab terms drafted (<code>curriculum/week1.md</code>)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>React + State</td>
+<td>Not started</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Backend + API</td>
+<td>Not started</td>
+</tr>
+<tr>
+<td>4</td>
+<td>System Design</td>
+<td>Not started</td>
+</tr>
+<tr>
+<td>5</td>
+<td>LLM in production</td>
+<td>Not started</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Agents + RAG</td>
+<td>Not started</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Provenance</h2>
+<ul>
+<li><strong>Date drafted:</strong> 2026-05-27</li>
+<li><strong>Designed via:</strong> <code>grill-me</code> skill (10 questions, ~30 min)</li>
+<li><strong>Author:</strong> Claude Opus 4.7 (1M context)</li>
+<li><strong>Status:</strong> v0 design locked. Ready to build.</li>
+</ul>
+
+<p class="meta">Generated from <code>spec.md</code> with marked. Open this file directly in a browser.</p>
+</body>
+</html>
