@@ -39,6 +39,7 @@ export default function RepPage() {
   const [result, setResult] = useState<EvalResult | null>(null);
   const [transcript, setTranscript] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [canRetry, setCanRetry] = useState(false);
   const [repCount, setRepCount] = useState(0);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -47,12 +48,20 @@ export default function RepPage() {
   const startedAtRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTakeRef = useRef<{ blob: Blob; durationSec: number } | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    // Pick the first prompt on the client only, so the random choice can't
-    // differ between server-rendered HTML and hydration.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPrompt(randomPrompt());
+    const first = randomPrompt();
+    /* eslint-disable react-hooks/set-state-in-effect -- client-only first prompt avoids an SSR/hydration mismatch */
+    if (first) {
+      setPrompt(first);
+    } else {
+      setErrorMsg('No practice prompts are available.');
+      setCanRetry(false);
+      setPhase('error');
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   const clearTimers = useCallback(() => {
@@ -71,9 +80,10 @@ export default function RepPage() {
     async (blob: Blob, durationSec: number) => {
       const current = prompt;
       if (!current) return;
+      lastTakeRef.current = { blob, durationSec };
+      setStatusText('Transcribing…');
       setPhase('processing');
       try {
-        setStatusText('Transcribing…');
         const fd = new FormData();
         fd.append('audio', blob, 'rep.webm');
         const tRes = await fetch('/api/transcribe', { method: 'POST', body: fd });
@@ -82,9 +92,10 @@ export default function RepPage() {
           throw new Error(e.message || 'Transcription failed.');
         }
         const { transcript: tx } = (await tRes.json()) as { transcript: string };
+        if (!mountedRef.current) return;
         setTranscript(tx);
-
         setStatusText('Evaluating…');
+
         const eRes = await fetch('/api/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -99,11 +110,16 @@ export default function RepPage() {
           const e = await eRes.json().catch(() => ({}));
           throw new Error(e.message || 'Evaluation failed.');
         }
-        setResult((await eRes.json()) as EvalResult);
+        const evaluation = (await eRes.json()) as EvalResult;
+        if (!mountedRef.current) return;
+        setResult(evaluation);
         setRepCount((c) => c + 1);
+        lastTakeRef.current = null;
         setPhase('feedback');
       } catch (err) {
+        if (!mountedRef.current) return;
         setErrorMsg(err instanceof Error ? err.message : 'Something went wrong.');
+        setCanRetry(lastTakeRef.current !== null);
         setPhase('error');
       }
     },
@@ -146,6 +162,7 @@ export default function RepPage() {
       setErrorMsg(
         'Microphone access is needed to record. Allow it in your browser, then try again.',
       );
+      setCanRetry(false);
       setPhase('error');
     }
   }, [stopRecording, stopStream, submit]);
@@ -153,9 +170,11 @@ export default function RepPage() {
   const nextPrompt = useCallback(() => {
     clearTimers();
     stopStream();
+    lastTakeRef.current = null;
     setResult(null);
     setTranscript('');
     setErrorMsg('');
+    setCanRetry(false);
     setSecondsLeft(MAX_SECONDS);
     setPrompt((p) => randomPrompt(p?.term));
     setPhase('idle');
@@ -173,8 +192,30 @@ export default function RepPage() {
     nextPrompt();
   }, [prompt, nextPrompt]);
 
+  // Re-run transcribe + evaluate on the recording we already captured.
+  const retry = useCallback(() => {
+    const take = lastTakeRef.current;
+    if (take) {
+      void submit(take.blob, take.durationSec);
+    } else {
+      setErrorMsg('');
+      setCanRetry(false);
+      setPhase('idle');
+    }
+  }, [submit]);
+
+  // Discard the failed take and record the same prompt again.
+  const recordAgain = useCallback(() => {
+    lastTakeRef.current = null;
+    setErrorMsg('');
+    setCanRetry(false);
+    setSecondsLeft(MAX_SECONDS);
+    setPhase('idle');
+  }, []);
+
   useEffect(
     () => () => {
+      mountedRef.current = false;
       clearTimers();
       stopStream();
     },
@@ -192,9 +233,7 @@ export default function RepPage() {
 
       {phase !== 'feedback' && (
         <section className="mt-6">
-          <div className="text-xs uppercase tracking-wide text-blue-400">
-            {prompt?.tag ?? '…'}
-          </div>
+          <div className="text-xs uppercase tracking-wide text-blue-400">{prompt?.tag ?? '…'}</div>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">{prompt?.term ?? ' '}</h1>
           <p className="mt-2 text-neutral-300">{prompt?.prompt ?? 'Preparing your prompt…'}</p>
         </section>
@@ -223,8 +262,10 @@ export default function RepPage() {
 
         {phase === 'recording' && (
           <>
-            <div className="text-5xl font-semibold tabular-nums text-blue-300">{secondsLeft}</div>
-            <div className="text-sm text-neutral-500">Speak as if to a senior engineer.</div>
+            <div aria-live="polite" className="flex flex-col items-center gap-1">
+              <div className="text-5xl font-semibold tabular-nums text-blue-300">{secondsLeft}</div>
+              <div className="text-sm text-neutral-500">Speak as if to a senior engineer.</div>
+            </div>
             <button
               type="button"
               onClick={stopRecording}
@@ -236,19 +277,32 @@ export default function RepPage() {
         )}
 
         {phase === 'processing' && (
-          <div className="py-10 text-center text-neutral-400">{statusText || 'Working…'}</div>
+          <div aria-live="polite" className="py-10 text-center text-neutral-400">
+            {statusText || 'Working…'}
+          </div>
         )}
 
         {phase === 'error' && (
           <>
-            <p className="text-center text-sm text-red-300">{errorMsg}</p>
+            <p role="alert" className="text-center text-sm text-red-300">
+              {errorMsg}
+            </p>
             <button
               type="button"
-              onClick={() => setPhase('idle')}
-              className="w-full rounded-2xl bg-neutral-800 px-6 py-4 text-base font-medium transition active:scale-[0.99]"
+              onClick={retry}
+              className="w-full rounded-2xl bg-blue-600 px-6 py-4 text-base font-medium text-white transition active:scale-[0.99]"
             >
-              Try again
+              {canRetry ? 'Retry' : 'Try again'}
             </button>
+            {canRetry && (
+              <button
+                type="button"
+                onClick={recordAgain}
+                className="text-sm text-neutral-500 hover:text-neutral-300"
+              >
+                Record again
+              </button>
+            )}
           </>
         )}
       </div>

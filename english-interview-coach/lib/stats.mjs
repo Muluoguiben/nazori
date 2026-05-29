@@ -1,32 +1,42 @@
-// Pure streak/stats helpers, shared by lib/db.ts and db/schema-check.mjs.
+// Pure streak/stats helpers, shared by lib/db.ts and the tests/checks.
+// Day bucketing is done in the user's IANA timezone so streak/today are correct
+// for non-UTC users near local midnight.
 
-export function toDayStr(value) {
-  if (value instanceof Date) return value.toISOString().slice(0, 10);
-  const s = String(value);
-  return s.length === 10 ? s : new Date(s).toISOString().slice(0, 10);
+export function localDay(value, tz = 'UTC') {
+  const d = value instanceof Date ? value : new Date(value);
+  try {
+    // en-CA formats as YYYY-MM-DD.
+    return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d);
+  } catch {
+    return d.toISOString().slice(0, 10);
+  }
 }
 
-// rows: [{ day, n }] grouped by day, any order. now: the reference "today".
-export function statsFromDays(rows, now = new Date()) {
+function addDays(dayStr, delta) {
+  const d = new Date(`${dayStr}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toISOString().slice(0, 10);
+}
+
+// times: array of created_at values (ISO strings or Date objects).
+// tz: IANA timezone. total: lifetime count (defaults to times.length).
+export function computeStats(times, tz = 'UTC', total) {
   const counts = new Map();
-  let total = 0;
-  for (const r of rows) {
-    const n = Number(r.n) || 0;
-    counts.set(toDayStr(r.day), n);
-    total += n;
+  for (const t of times) {
+    const day = localDay(t, tz);
+    counts.set(day, (counts.get(day) || 0) + 1);
   }
 
-  const todayStr = toDayStr(now);
+  const todayStr = localDay(new Date(), tz);
   const today = counts.get(todayStr) ?? 0;
 
   // Count consecutive days back from today (or yesterday, if nothing yet today).
   let streak = 0;
-  const cursor = new Date(`${todayStr}T00:00:00Z`);
-  if (!counts.has(todayStr)) cursor.setUTCDate(cursor.getUTCDate() - 1);
-  while (counts.has(cursor.toISOString().slice(0, 10))) {
+  let cursor = counts.has(todayStr) ? todayStr : addDays(todayStr, -1);
+  while (counts.has(cursor)) {
     streak += 1;
-    cursor.setUTCDate(cursor.getUTCDate() - 1);
+    cursor = addDays(cursor, -1);
   }
 
-  return { streak, today, total };
+  return { streak, today, total: typeof total === 'number' ? total : times.length };
 }

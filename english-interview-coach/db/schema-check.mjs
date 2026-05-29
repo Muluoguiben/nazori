@@ -3,8 +3,14 @@
 // Usage: node db/schema-check.mjs
 import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
-import { INSERT_REP, INSERT_SKIP, SELECT_RECENT_REPS, SELECT_REP_DAYS } from './queries.mjs';
-import { statsFromDays } from '../lib/stats.mjs';
+import {
+  INSERT_REP,
+  INSERT_SKIP,
+  SELECT_RECENT_REPS,
+  SELECT_REP_TIMES,
+  SELECT_REP_TOTAL,
+} from './queries.mjs';
+import { computeStats } from '../lib/stats.mjs';
 
 const schema = await readFile(new URL('./schema.sql', import.meta.url), 'utf8');
 
@@ -62,9 +68,10 @@ for (const offset of [0, 1, 2]) {
     at.toISOString(),
   ]);
 }
-const dayRows = await db.query(SELECT_REP_DAYS);
-const stats = statsFromDays(dayRows.rows, now);
-const streakOk = stats.streak === 3;
+const times = (await db.query(SELECT_REP_TIMES)).rows.map((r) => r.created_at);
+const totalRow = (await db.query(SELECT_REP_TOTAL)).rows[0];
+const stats = computeStats(times, 'UTC', totalRow.n);
+const streakOk = stats.streak === 3 && stats.today >= 1 && stats.total === times.length;
 
 await db.close();
 

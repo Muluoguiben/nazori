@@ -11,7 +11,7 @@ A phone-first PWA to practice explaining tech concepts out loud in English, for 
 ## What's done (v0 build complete)
 
 - **Spec:** `spec.md` (10 v0 design decisions locked 2026-05-27). HTML view at `spec.html`.
-- **Curriculum:** `curriculum/week1.md`–`week3.md` (week 4–6 to come). `prompts.json` has 20 Week 1 prompts.
+- **Curriculum:** all six weeks drafted — `curriculum/week1.md`–`week6.md` (65 terms each, 390 total). `prompts.json` wires 20 Week-1 concepts for v0.
 - **App:** Next.js 16 (App Router) + React 19 + Tailwind v4 PWA.
   1. `prompts.json` from Week 1 — done.
   2. PWA scaffold — manifest, icons, service worker (`app/`, `public/`).
@@ -20,12 +20,12 @@ A phone-first PWA to practice explaining tech concepts out loud in English, for 
   5. Shared-secret cookie auth — `middleware.ts`, `/login`, `/api/login` (`APP_SECRET`).
   6. Streak counter — `/api/stats`, shown on the home screen.
 
-Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gracefully, and `DEMO_MODE=1` runs the full flow with canned data. Verify with `npm run build`, `npm run lint`, `npm run test:e2e`, `npm run db:check`.
+Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gracefully (production fails closed without `APP_SECRET`), and `DEMO_MODE=1` runs the full flow with canned data. Verify with `npm run build`, `npm run lint`, `npm run test:unit`, `npm run db:check`, `npm run test:e2e`.
 
 ## What's left
 
 - **Deploy to Vercel:** set the project root to `english-interview-coach`; add env `APP_SECRET`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL`; run `npm run db:migrate` once. See `.env.example`.
-- **Week 4–6 prompts** when the curriculum lands.
+- **Wire more prompts** — `prompts.json` covers 20 Week-1 concepts; weeks 2–6 (drafted) aren't wired yet.
 - Deferred to v1+ (do not scope-creep into v0): mock interview mode, reference answers, progress trends.
 
 ## Design principles (do not violate)
@@ -48,7 +48,7 @@ Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gr
 ```
 spec.md                  v0 design (read first)
 prompts.json             20 Week 1 prompts (term, prompt, tag)
-curriculum/week{1..3}.md vocab content (4-6 to come)
+curriculum/week{1..6}.md vocab content (390 terms)
 app/                     App Router: home, /rep, /login, /api/*
 lib/                     db, auth, prompts, stats, types
 db/                      schema.sql, migrate + check scripts

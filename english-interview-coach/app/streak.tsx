@@ -9,7 +9,8 @@ export function StreakBadge() {
 
   useEffect(() => {
     let active = true;
-    fetch('/api/stats')
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    fetch(`/api/stats?tz=${encodeURIComponent(tz)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((s: Stats | null) => {
         if (active) setStats(s);

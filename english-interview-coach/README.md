@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# English Interview Coach
 
-## Getting Started
+A phone-first PWA to practice explaining technical concepts out loud in English for job interviews. Record a 90-second answer; it's transcribed (Whisper) and graded (Claude Sonnet 4.6) with scores, an inline-corrected transcript, and three specific fixes. Solo use.
 
-First, run the development server:
+See `spec.md` for the v0 design and `AGENTS.md` for working notes.
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+cp .env.example .env.local   # add keys, or set DEMO_MODE=1 to run without them
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`DEMO_MODE=1` returns a canned transcript + evaluation, so the full flow works without API keys.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment (`.env.example`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Var | Purpose |
+| --- | --- |
+| `OPENAI_API_KEY` | Whisper speech-to-text (`/api/transcribe`) |
+| `ANTHROPIC_API_KEY` | Claude Sonnet 4.6 evaluation (`/api/evaluate`) |
+| `DATABASE_URL` | Neon Postgres for rep history + streak |
+| `APP_SECRET` | Shared-secret gate; first visit asks once. Unset = open (dev only) |
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` / `build` / `start` / `lint`
+- `npm run test:unit` — streak math (node:test)
+- `npm run db:check` — schema + queries against in-process Postgres (PGlite)
+- `npm run test:e2e` — Playwright (build + browser)
+- `npm run db:migrate` — apply `db/schema.sql` to `DATABASE_URL`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy (Vercel)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Import the repo; set the project root to `english-interview-coach`.
+2. Add env vars: `APP_SECRET`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL`.
+3. Run `npm run db:migrate` once (with `DATABASE_URL` set) to create the tables.

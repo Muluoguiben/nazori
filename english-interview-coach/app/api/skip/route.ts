@@ -4,7 +4,12 @@ import { saveSkip } from '@/lib/db';
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
-  const { term } = (await request.json()) as { term?: string };
+  let term: string | undefined;
+  try {
+    ({ term } = (await request.json()) as { term?: string });
+  } catch {
+    return NextResponse.json({ error: 'bad_request' }, { status: 400 });
+  }
   if (!term) {
     return NextResponse.json({ error: 'no_term' }, { status: 400 });
   }

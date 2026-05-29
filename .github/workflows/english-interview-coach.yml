@@ -1,0 +1,31 @@
+name: english-interview-coach CI
+
+on:
+  pull_request:
+    paths:
+      - 'english-interview-coach/**'
+      - '.github/workflows/english-interview-coach.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: english-interview-coach
+    env:
+      DEMO_MODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: english-interview-coach/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run db:check
+      - run: npm run test:unit
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

@@ -16,8 +16,8 @@ export const SELECT_RECENT_REPS = `SELECT
   ORDER BY created_at DESC
   LIMIT $1`;
 
-export const SELECT_REP_DAYS = `SELECT created_at::date AS day, COUNT(*)::int AS n
-  FROM reps
-  GROUP BY day
-  ORDER BY day DESC
-  LIMIT 400`;
+// Recent timestamps drive streak/today (bucketed by the client's timezone in JS).
+export const SELECT_REP_TIMES = `SELECT created_at FROM reps ORDER BY created_at DESC LIMIT 2000`;
+
+// Lifetime total counted separately so it never undercounts beyond the window above.
+export const SELECT_REP_TOTAL = `SELECT COUNT(*)::int AS n FROM reps`;

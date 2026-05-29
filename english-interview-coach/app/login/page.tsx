@@ -25,7 +25,8 @@ export default function LoginPage() {
         return;
       }
       const raw = new URLSearchParams(window.location.search).get('next') ?? '/';
-      const next = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/';
+      // Allow only same-origin absolute paths; reject //host and /\host.
+      const next = /^\/(?![/\\])/.test(raw) ? raw : '/';
       router.replace(next);
       router.refresh();
     } catch {

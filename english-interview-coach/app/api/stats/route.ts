@@ -3,9 +3,10 @@ import { getStats } from '@/lib/db';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const tz = new URL(request.url).searchParams.get('tz') || 'UTC';
   try {
-    return NextResponse.json(await getStats());
+    return NextResponse.json(await getStats(tz));
   } catch (err) {
     console.error('Failed to compute stats:', err);
     return NextResponse.json({ streak: 0, today: 0, total: 0 });

@@ -218,7 +218,7 @@ Not yet decided. To resolve before or during build:
 - Onboarding: what does first-ever visit look like? (Set secret, do a test rep?)
 - Visual design: color palette, typography, dark mode
 - Prompt curation: which ~20 of the 65 week1 terms become Deep mode prompts?
-- Week 2+ content: React, system design, LLM/agents — to be drafted closer to needed
+- Week 2-6 content: drafted (65 terms each); not yet wired into prompts.json
 
 ---
 
@@ -227,11 +227,11 @@ Not yet decided. To resolve before or during build:
 | Week | Topic | Status |
 |---|---|---|
 | 1 | JavaScript / TypeScript / Async | 65 vocab terms drafted (`curriculum/week1.md`) |
-| 2 | React + State | Not started |
-| 3 | Backend + API | Not started |
-| 4 | System Design | Not started |
-| 5 | LLM in production | Not started |
-| 6 | Agents + RAG | Not started |
+| 2 | React + State | 65 terms drafted (`curriculum/week2.md`) |
+| 3 | Backend + API | 65 terms drafted (`curriculum/week3.md`) |
+| 4 | System Design | 65 terms drafted (`curriculum/week4.md`) |
+| 5 | LLM in production | 65 terms drafted (`curriculum/week5.md`) |
+| 6 | Agents + RAG | 65 terms drafted (`curriculum/week6.md`) |
 
 ---
 
