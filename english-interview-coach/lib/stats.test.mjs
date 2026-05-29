@@ -50,3 +50,11 @@ test('empty history yields zeros', () => {
   const s = computeStats([], 'UTC');
   assert.deepEqual(s, { streak: 0, today: 0, total: 0 });
 });
+
+test('localDay handles a space-separated Postgres timestamp', () => {
+  assert.equal(localDay('2026-05-29 12:00:00+00', 'UTC'), '2026-05-29');
+});
+
+test('localDay falls back safely on an unparseable value (no throw)', () => {
+  assert.match(localDay('not-a-date', 'UTC'), /^\d{4}-\d{2}-\d{2}$/);
+});

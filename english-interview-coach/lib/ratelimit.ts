@@ -17,7 +17,19 @@ export function rateLimit(key: string, limit: number, windowMs: number): boolean
   return true;
 }
 
+// Key off a platform-trusted source. The leftmost X-Forwarded-For entry is
+// client-controlled (spoofable), so prefer x-real-ip (set by the platform) or
+// the last XFF hop, falling back to a shared key when neither is present.
 export function clientKey(request: Request): string {
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp.trim();
   const xff = request.headers.get('x-forwarded-for');
-  return (xff ? xff.split(',')[0].trim() : '') || 'local';
+  if (xff) {
+    const hops = xff
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (hops.length > 0) return hops[hops.length - 1];
+  }
+  return 'local';
 }

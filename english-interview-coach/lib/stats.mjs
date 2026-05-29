@@ -4,6 +4,12 @@
 
 export function localDay(value, tz = 'UTC') {
   const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) {
+    // Unparseable timestamp (e.g. a non-ISO driver format): use the leading
+    // YYYY-MM-DD if present, else today — never throw.
+    const m = String(value).match(/^\d{4}-\d{2}-\d{2}/);
+    return m ? m[0] : new Date().toISOString().slice(0, 10);
+  }
   try {
     // en-CA formats as YYYY-MM-DD.
     return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d);

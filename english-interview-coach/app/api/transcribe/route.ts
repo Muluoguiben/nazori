@@ -28,6 +28,15 @@ export async function POST(request: Request) {
     );
   }
 
+  // Reject oversized uploads by Content-Length before buffering the whole body.
+  const declaredSize = Number(request.headers.get('content-length'));
+  if (Number.isFinite(declaredSize) && declaredSize > MAX_AUDIO_BYTES) {
+    return NextResponse.json(
+      { error: 'audio_too_large', message: 'Recording is too large.' },
+      { status: 413 },
+    );
+  }
+
   let form: FormData;
   try {
     form = await request.formData();
