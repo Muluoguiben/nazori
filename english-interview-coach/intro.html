@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>English Interview Coach — say it out loud</title>
+<style>
+  :root{
+    --bg:#0a0b0d; --panel:#141619; --panel2:#1a1d22; --line:#262a30;
+    --fg:#eef1f4; --muted:#9aa3ad; --faint:#6b7480;
+    --blue:#3b82f6; --blue2:#60a5fa; --blue3:#93c5fd; --green:#3ecf8e;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--blue2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+  .btn{display:inline-block;background:var(--blue);color:#fff;font-weight:600;font-size:15px;
+    padding:13px 22px;border-radius:14px;box-shadow:0 8px 30px -8px rgba(59,130,246,.6);transition:.15s}
+  .btn:hover{background:#2f74e8;text-decoration:none;transform:translateY(-1px)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--fg)}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--line)}
+  nav .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+  nav .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--blue),#7aa9ff);
+    display:flex;align-items:center;justify-content:center;font-size:16px}
+  .pill{font-size:11px;color:var(--blue3);border:1px solid #284069;background:#101a2e;border-radius:999px;
+    padding:3px 9px;font-weight:600;letter-spacing:.04em}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;padding:64px 0 56px}
+  .hero h1{font-size:42px;line-height:1.08;letter-spacing:-.03em;margin:14px 0 0;font-weight:800}
+  .hero .lede{color:var(--muted);font-size:17px;margin:20px 0 0;max-width:34em}
+  .hero .actions{display:flex;gap:12px;align-items:center;margin-top:28px;flex-wrap:wrap}
+  .hero .note{color:var(--faint);font-size:12.5px;margin-top:14px}
+  @media(max-width:820px){.hero{grid-template-columns:1fr;gap:36px;padding:40px 0}.hero h1{font-size:33px}}
+
+  /* phone mockup */
+  .phone{justify-self:center;width:248px;border-radius:34px;background:#000;padding:9px;
+    border:1px solid #2a2e35;box-shadow:0 40px 90px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03)}
+  .screen{background:var(--bg);border-radius:26px;padding:18px 15px 20px;overflow:hidden}
+  .screen .top{display:flex;justify-content:space-between;font-size:11px;color:var(--faint)}
+  .screen .tag{color:var(--blue2);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-top:14px}
+  .screen .term{font-size:18px;font-weight:700;margin-top:2px}
+  .screen .fbk{font-size:13px;font-weight:600;margin:16px 0 8px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .sc{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:7px 2px;text-align:center}
+  .sc .v{font-size:15px;font-weight:700}.sc .l{font-size:7.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+  .tx{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 9px;font-size:11px;
+    color:#cdd3da;margin-top:9px;line-height:1.5}
+  .tx b{color:var(--blue3);font-weight:600}
+  .fix{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:10.5px;
+    color:#cdd3da;margin-top:6px}
+
+  section{padding:52px 0;border-top:1px solid var(--line)}
+  .kicker{color:var(--blue2);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  h2{font-size:27px;letter-spacing:-.02em;margin:8px 0 0;font-weight:750}
+  .sub{color:var(--muted);margin-top:8px;max-width:42em}
+
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:30px}
+  .cards.three{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:760px){.cards,.cards.three{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px}
+  .card h3{margin:0;font-size:16px;letter-spacing:-.01em}
+  .card p{margin:7px 0 0;color:var(--muted);font-size:14px}
+  .card .num{width:28px;height:28px;border-radius:8px;background:#13213a;color:var(--blue3);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-bottom:10px}
+
+  .who{display:grid;grid-template-columns:1fr 1fr;gap:10px 26px;margin-top:26px}
+  @media(max-width:760px){.who{grid-template-columns:1fr}}
+  .who div{display:flex;gap:10px;color:#d3d8de;font-size:14.5px}
+  .who .ck{color:var(--green);flex:none}
+
+  details{border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-top:11px;overflow:hidden}
+  summary{cursor:pointer;padding:15px 17px;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--blue2);font-weight:700}
+  details[open] summary::after{content:"–"}
+  details .a{padding:0 17px 16px;color:var(--muted);font-size:14px}
+
+  .cta{background:linear-gradient(180deg,#10203c,#0c1422);border:1px solid #233655;border-radius:20px;
+    padding:40px 30px;text-align:center;margin:52px 0}
+  .cta h2{font-size:26px}
+  .cta p{color:var(--muted);max-width:40em;margin:10px auto 22px}
+  .cta .url{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--blue3);font-size:13px;margin-top:14px;display:block}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 60px;color:var(--faint);font-size:12.5px;line-height:1.7}
+  .tstack{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 9px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <div class="brand"><span class="logo">🎙️</span> English Interview Coach</div>
+    <a class="btn ghost" href="https://english-interview-coach.vercel.app" target="_blank" rel="noopener">Open the app →</a>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div>
+      <span class="pill">v0 · phone-first PWA · live now</span>
+      <h1>You know closures cold. Now say it out loud.</h1>
+      <p class="lede">You can read the docs, write the code, and explain any concept in your head. Then an interviewer asks you to say it in English — and it comes out tangled. This is a phone-first tool that closes that gap: pick a concept, talk for up to 90 seconds, and get instant AI feedback on what a senior listener actually heard. No editing, no model answer to memorize, no second take to hide behind. Built for one engineer preparing for AI &amp; Agent roles in 2026.</p>
+      <div class="actions">
+        <a class="btn" href="https://english-interview-coach.vercel.app" target="_blank" rel="noopener">Do one rep tonight →</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+      <p class="note">Open it on your phone, tap Start session, and walk a full rep — prompt → 90-second recording → scored feedback. The live link runs in demo mode with canned feedback, so you can see the whole flow before wiring up your own API keys.</p>
+    </div>
+
+    <!-- phone mockup showing a sample feedback screen -->
+    <div class="phone" aria-hidden="true">
+      <div class="screen">
+        <div class="top"><span>← End session</span><span>Reps: 3</span></div>
+        <div class="tag">js-core</div>
+        <div class="term">closure</div>
+        <div class="fbk">Feedback</div>
+        <div class="grid4">
+          <div class="sc"><div class="v">7</div><div class="l">Accur</div></div>
+          <div class="sc"><div class="v">6</div><div class="l">Struct</div></div>
+          <div class="sc"><div class="v">7</div><div class="l">Lang</div></div>
+          <div class="sc"><div class="v">132</div><div class="l">wpm</div></div>
+        </div>
+        <div class="tx">A closure is when a function <b>captures</b> the variables from where it was created, even after the outer function has finished running.</div>
+        <div class="fix">Use “captures” instead of “remembers” — the precise term for a senior audience.</div>
+        <div class="fix">Open with a one-sentence definition before the mechanism.</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- VALUE PROPS -->
+  <section>
+    <span class="kicker">Why it works</span>
+    <h2>Practice the part you actually skip</h2>
+    <div class="cards">
+      <div class="card"><h3>Closes the knowing-vs-saying gap</h3><p>The concept is already in your head. The reps train the missing part: getting it out of your mouth in clear English, under time pressure, the way an interviewer hears it.</p></div>
+      <div class="card"><h3>Feedback on what you said, not what you meant</h3><p>Whisper transcribes exactly what came out and Claude grades that. If a word got mangled, you see it — because the interviewer would have heard it too.</p></div>
+      <div class="card"><h3>90 seconds, not 90 minutes</h3><p>One concept, one short take, then feedback. The rep is small enough that you actually do it tonight, and the next night — instead of saving prep for a weekend that never comes.</p></div>
+      <div class="card"><h3>One rep keeps the streak</h3><p>Finish a single explanation and your daily streak stays alive. Skips don’t count against you. No all-or-nothing routine to fall off of — just show up and say one thing out loud.</p></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <span class="kicker">How it works</span>
+    <h2>A full rep takes about two minutes</h2>
+    <div class="cards">
+      <div class="card"><div class="num">1</div><h3>Tap Start session</h3><p>You get one concept prompt — a term plus a question, like “closure / Explain closure in 60 seconds, with an example.” One thing to explain, no menu to navigate.</p></div>
+      <div class="card"><div class="num">2</div><h3>Talk for up to 90 seconds</h3><p>Tap Start recording and a 90-second countdown begins. Explain it as if to a senior engineer. Stop when you’re done, or let it auto-stop and auto-submit at the limit. The cap is the point: it trains concision under interview pressure.</p></div>
+      <div class="card"><div class="num">3</div><h3>Read your instant feedback</h3><p>Your audio goes to Whisper for a transcript, then to Claude Sonnet 4.6 for grading: four scores (Accuracy, Structure, Language /10, plus Pace in wpm against a 110–150 target), your transcript rewritten with the key fixes in bold, and exactly 3 fixes that quote your own words.</p></div>
+      <div class="card"><div class="num">4</div><h3>Go again, skip, or stop</h3><p>Tap Next for a new random prompt, Skip this concept if it’s unfamiliar (it doesn’t count against your streak), or End session. Completing at least one rep keeps the daily streak going.</p></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <span class="kicker">What's in v0</span>
+    <h2>Everything you need for one focused habit</h2>
+    <div class="cards three">
+      <div class="card"><h3>Explanation reps, one at a time</h3><p>A single concept prompt shown as term + question, tagged by topic. v0 ships 20 hand-filtered Week-1 prompts across JavaScript, TypeScript, and async. No clutter, no choosing.</p></div>
+      <div class="card"><h3>90-second recorder, hard cap</h3><p>In-browser recording via MediaRecorder with a live countdown, auto-stop and auto-submit at the limit, plus a manual “Stop &amp; submit” when you finish early.</p></div>
+      <div class="card"><h3>Whisper transcription, no stored audio</h3><p>Speech-to-text runs server-side via OpenAI Whisper. The audio blob is never persisted — only the transcript, scores, and fixes are kept.</p></div>
+      <div class="card"><h3>Four-dimension AI scoring</h3><p>Claude Sonnet 4.6 scores Accuracy, Structure, and Language 1–10, plus a server-computed words-per-minute Pace against a 110–150 target, returned as strict JSON.</p></div>
+      <div class="card"><h3>Corrected transcript + 3 fixes</h3><p>Your own words played back with the most important fixes in bold, plus exactly three actionable corrections that quote what you actually said.</p></div>
+      <div class="card"><h3>Daily streak with history</h3><p>One completed rep keeps the streak; skips are ignored. Rep history is saved to Neon Postgres so it follows you across phone, Mac, and Windows.</p></div>
+    </div>
+  </section>
+
+  <!-- DIFFERENTIATORS -->
+  <section>
+    <span class="kicker">Opinionated by design</span>
+    <h2>Three choices that make it different</h2>
+    <div class="cards three">
+      <div class="card"><h3>It grades speaking, not vocabulary</h3><p>Silent vocab and flashcard drilling is deliberately left to Anki. This app does one thing: explaining concepts out loud. Keeping them separate matches when and where you actually do each kind of practice.</p></div>
+      <div class="card"><h3>The transcript is the ground truth</h3><p>There’s no edit-the-transcript step before grading. What Whisper heard is what gets scored — because a mishear is real signal about your pronunciation, the same as it would be with a human listener.</p></div>
+      <div class="card"><h3>No reference answers to recite</h3><p>v0 uses freestyle AI judgment against a cached rubric, with no model answers to memorize. You practice thinking and speaking, not reciting a script.</p></div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section>
+    <span class="kicker">Who it's for</span>
+    <h2>Built for one specific person</h2>
+    <div class="who">
+      <div><span class="ck">✓</span><span>A 3–4 year mid-level full-stack engineer with strong reading/writing English but weak speaking.</span></div>
+      <div><span class="ck">✓</span><span>Someone job-searching for AI &amp; Agent roles in 2026 who needs to sound fluent in interviews.</span></div>
+      <div><span class="ck">✓</span><span>An engineer who freezes on “can you walk me through how X works?” despite knowing X cold in code.</span></div>
+      <div><span class="ck">✓</span><span>A solo learner who already uses Anki for vocab and wants a separate slot for daily speaking.</span></div>
+      <div><span class="ck">✓</span><span>Someone who wants a private, phone-first practice habit — not another course to abandon halfway.</span></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <span class="kicker">Honest FAQ</span>
+    <h2>What it is — and what it isn't yet</h2>
+    <details open><summary>How many concepts can I practice right now?</summary><div class="a">20 hand-filtered Week-1 prompts covering JavaScript core, TypeScript types, async, and functions — e.g. closure, the event loop, generics, memoization. Six weeks of curriculum (~390 terms across React, backend, system design, LLMs, and agents/RAG) are drafted, but Weeks 2–6 aren’t yet wired into live prompts.</div></details>
+    <details><summary>Is this a mock interview with follow-up questions?</summary><div class="a">Not yet. v0 is explanation reps only: one prompt, you explain it, you get feedback. A mock-interview mode (multi-turn, follow-up questions, an interviewer voice, end-of-session feedback) is coming next in v1 — it doesn’t exist today.</div></details>
+    <details><summary>Can I fix the transcript before it gets graded?</summary><div class="a">No, and that’s on purpose. The Whisper transcript goes straight to grading. If a word is misheard, that tells you something real about your pronunciation. There’s no edit/review step and no model answer to compare against.</div></details>
+    <details><summary>Is my audio stored anywhere?</summary><div class="a">No. The audio is transcribed server-side and then discarded. Only the transcript, scores, and fixes are saved to Neon Postgres.</div></details>
+    <details><summary>Can I try it without API keys?</summary><div class="a">Yes. A demo mode returns a canned transcript and evaluation so the full flow runs end to end. The public link currently runs in demo mode — the sample transcript and scores there are fixed placeholders, not real grading. Real Whisper transcription and Claude grading happen only with API keys configured.</div></details>
+    <details><summary>Is this a polished product I can sign up for?</summary><div class="a">No. It’s a v0, single-user tool gated by one shared-secret cookie, with no multi-user accounts. Prompts live in a JSON file in the repo, and progress-trend analytics are deferred to a later version. It’s a personal practice rig, not a SaaS product.</div></details>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h2>Do one rep tonight.</h2>
+    <p>Open it on your phone, tap Start session, and walk a full rep — from prompt to 90-second recording to scored feedback. The live link runs in demo mode with canned feedback, so you can see the whole flow before wiring up your own API keys.</p>
+    <a class="btn" href="https://english-interview-coach.vercel.app" target="_blank" rel="noopener">Open English Interview Coach →</a>
+    <span class="url">english-interview-coach.vercel.app</span>
+  </div>
+
+  <footer>
+    <div><strong style="color:var(--muted)">Under the hood.</strong> Next.js 16 (App Router) &amp; React 19 with Tailwind CSS v4, shipped as an installable PWA. OpenAI Whisper (whisper-1) handles server-side speech-to-text; Claude Sonnet 4.6 grades via strict json_schema output with an ephemeral-cached rubric. Rep history and streak live in Neon Postgres; access is gated by a shared-secret cookie in Next.js middleware; hosted on Vercel with server-side rate limiting (30 req/min) on transcribe and evaluate. Audio is never stored.</div>
+    <div class="tstack">
+      <span class="chip">Next.js 16</span><span class="chip">React 19</span><span class="chip">Tailwind v4</span>
+      <span class="chip">OpenAI Whisper</span><span class="chip">Claude Sonnet 4.6</span><span class="chip">Neon Postgres</span>
+      <span class="chip">Vercel</span><span class="chip">PWA</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
