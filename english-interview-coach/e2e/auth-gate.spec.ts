@@ -30,4 +30,10 @@ test.describe('auth gate (APP_SECRET set)', () => {
     const res = await page.request.get('/api/stats');
     expect(res.status()).toBe(200);
   });
+
+  test('public /intro.html is reachable without auth even when the gate is on', async ({ request }) => {
+    const res = await request.get('/intro.html');
+    expect(res.status()).toBe(200);
+    expect(await res.text()).toContain('English Interview Coach');
+  });
 });
