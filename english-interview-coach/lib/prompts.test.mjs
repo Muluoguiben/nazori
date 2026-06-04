@@ -7,6 +7,7 @@ import {
   WEEKS,
   filterByScope,
   progressOf,
+  promptId,
   selectFrom,
   scopeChoices,
   parseScope,
@@ -15,6 +16,7 @@ import {
 } from './scope.mjs';
 
 const prompts = JSON.parse(readFileSync(new URL('../prompts.json', import.meta.url), 'utf8'));
+const idsOf = (list) => list.map((p) => promptId(p));
 
 test('curriculum has 390 terms and every tag is known and used', () => {
   assert.equal(prompts.length, 390);
@@ -22,6 +24,11 @@ test('curriculum has 390 terms and every tag is known and used', () => {
   const used = new Set(prompts.map((p) => p.tag));
   for (const tag of TAGS_IN_ORDER) assert.ok(used.has(tag), `declared tag never used: ${tag}`);
   assert.equal(used.size, TAGS_IN_ORDER.length); // 36, no extras
+});
+
+test('promptId is unique across all 390 prompts even though some terms repeat', () => {
+  assert.equal(new Set(prompts.map(promptId)).size, 390);
+  assert.ok(new Set(prompts.map((p) => p.term)).size < 390, 'expected some repeated terms');
 });
 
 test('each week filters to 65 terms', () => {
@@ -36,7 +43,7 @@ test('a tag filter selects only that tag', () => {
   assert.ok(hooks.every((p) => p.tag === 'hooks'));
 });
 
-test('sequential serves the first not-done term in curriculum order', () => {
+test('sequential serves the first not-done prompt in curriculum order', () => {
   const all = selectFrom(prompts, { scope: { type: 'all' }, mode: 'sequential', done: [] });
   assert.equal(all.term, prompts[0].term);
 
@@ -47,21 +54,41 @@ test('sequential serves the first not-done term in curriculum order', () => {
   const next = selectFrom(prompts, {
     scope: { type: 'week', week: 2 },
     mode: 'sequential',
-    done: [w2[0].term],
+    done: [promptId(w2[0])],
   });
   assert.equal(next.term, w2[1].term);
 });
 
-test('sequential reviews in order once a scope is fully done, skipping prevTerm', () => {
-  const pool = filterByScope(prompts, { type: 'tag', tag: 'modules' });
-  const pick = selectFrom(prompts, {
-    scope: { type: 'tag', tag: 'modules' },
-    mode: 'sequential',
-    done: pool.map((p) => p.term),
-    prevTerm: pool[0].term,
-  });
-  assert.ok(pick);
-  assert.notEqual(pick.term, pool[0].term);
+test('a repeated term is tracked independently per prompt (keyed by id, not term)', () => {
+  // "error boundary" appears under both `errors` (W1) and `react-core` (W2).
+  const dupes = prompts.filter((p) => p.term === 'error boundary');
+  assert.equal(dupes.length, 2);
+  const [a, b] = dupes;
+  assert.notEqual(promptId(a), promptId(b));
+
+  // Completing only the first occurrence must not credit the second.
+  const done = [promptId(a)];
+  assert.equal(progressOf(prompts, { type: 'tag', tag: a.tag }, done).done, 1);
+  assert.equal(progressOf(prompts, { type: 'tag', tag: b.tag }, done).done, 0);
+});
+
+test('sequential review cycles through the whole pool, not just the first two', () => {
+  const pool = filterByScope(prompts, { type: 'tag', tag: 'modules' }); // 5 prompts, all done
+  const done = idsOf(pool);
+  let prev = promptId(pool[0]);
+  const visited = [pool[0].term];
+  for (let i = 1; i < pool.length; i++) {
+    const pick = selectFrom(prompts, {
+      scope: { type: 'tag', tag: 'modules' },
+      mode: 'sequential',
+      done,
+      prev,
+    });
+    assert.notEqual(promptId(pick), prev); // never repeats back-to-back
+    visited.push(pick.term);
+    prev = promptId(pick);
+  }
+  assert.equal(new Set(visited).size, pool.length); // every prompt reached (no 2-cycle)
 });
 
 test('random stays in scope and is deterministic with an injected rand', () => {
@@ -71,20 +98,21 @@ test('random stays in scope and is deterministic with an injected rand', () => {
   assert.equal(pick.term, hooks[0].term);
 });
 
-test('random avoids repeating prevTerm', () => {
+test('random avoids repeating the previous prompt', () => {
   const hooks = filterByScope(prompts, { type: 'tag', tag: 'hooks' });
   const pick = selectFrom(prompts, {
     scope: { type: 'tag', tag: 'hooks' },
     mode: 'random',
-    prevTerm: hooks[0].term,
+    prev: promptId(hooks[0]),
     rand: () => 0,
   });
   assert.notEqual(pick.term, hooks[0].term);
 });
 
-test('progressOf counts done terms within scope only', () => {
+test('progressOf counts done prompts within scope only', () => {
   const hooks = filterByScope(prompts, { type: 'tag', tag: 'hooks' });
-  const done = [hooks[0].term, hooks[1].term, 'closure'];
+  const closure = prompts.find((p) => p.term === 'closure');
+  const done = [promptId(hooks[0]), promptId(hooks[1]), promptId(closure)];
   assert.deepEqual(progressOf(prompts, { type: 'tag', tag: 'hooks' }, done), { done: 2, total: 14 });
 });
 

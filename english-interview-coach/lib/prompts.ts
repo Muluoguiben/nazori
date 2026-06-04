@@ -2,6 +2,7 @@ import promptsData from '@/prompts.json';
 import {
   selectFrom,
   progressOf,
+  promptId as rawPromptId,
   scopeChoices as rawScopeChoices,
   parseScope as rawParseScope,
   scopeToValue as rawScopeToValue,
@@ -22,25 +23,30 @@ function isPrompt(value: unknown): value is Prompt {
 
 export const prompts: Prompt[] = Array.isArray(promptsData) ? promptsData.filter(isPrompt) : [];
 
-export function randomPrompt(excludeTerm?: string): Prompt | null {
-  return selectFrom(prompts, {
-    scope: { type: 'all' },
-    mode: 'random',
-    prevTerm: excludeTerm,
-  }) as Prompt | null;
+// Stable, unique key for a prompt (tag + term). A few terms repeat across weeks
+// as distinct prompts, so completion is tracked by id, not by term.
+export function promptId(p: Prompt): string {
+  return rawPromptId(p) as string;
 }
 
 export function selectPrompt(opts: {
   scope: Scope;
   mode: Mode;
   done?: Iterable<string>;
-  prevTerm?: string;
+  prev?: string;
 }): Prompt | null {
   return selectFrom(prompts, opts) as Prompt | null;
 }
 
 export function progressFor(scope: Scope, done: Iterable<string>): { done: number; total: number } {
   return progressOf(prompts, scope, done instanceof Set ? done : new Set(done));
+}
+
+// The server stores only terms (reps ∪ skipped); map them back to prompt ids.
+// A repeated term marks every prompt that shares it (best-effort across devices).
+export function idsForDoneTerms(terms: Iterable<string>): string[] {
+  const set = terms instanceof Set ? terms : new Set(terms);
+  return prompts.filter((p) => set.has(p.term)).map((p) => promptId(p));
 }
 
 export type ScopeChoice = {

@@ -79,37 +79,50 @@ export function filterByScope(prompts, scope) {
   return prompts.filter((p) => inScope(p, scope));
 }
 
+// Stable, unique key for one prompt. The 390-term dataset repeats a few terms
+// across weeks (error boundary, batching, cache invalidation) as distinct
+// prompts; their tag differs, so tag+term uniquely identifies each prompt and is
+// stable across reorderings (unlike an array index).
+export function promptId(p) {
+  return `${p.tag}${p.term}`;
+}
+
 export function progressOf(prompts, scope, done) {
   const doneSet = done instanceof Set ? done : new Set(done || []);
   const pool = filterByScope(prompts, scope);
   let n = 0;
-  for (const p of pool) if (doneSet.has(p.term)) n += 1;
+  for (const p of pool) if (doneSet.has(promptId(p))) n += 1;
   return { done: n, total: pool.length };
 }
 
 // Pick the next prompt within `scope`.
 //   mode 'sequential' walks curriculum order and serves the first not-yet-done
-//     term; once every term in scope is done it reviews in order.
+//     prompt; once every prompt in scope is done it cycles through them in order
+//     for review.
 //   mode 'random' picks uniformly within scope.
-// Both avoid repeating `prevTerm` back-to-back when the pool allows it.
+// `done` is a set of prompt ids; `prev` is the previous prompt's id. Both modes
+// avoid repeating `prev` back-to-back when the pool allows it.
 export function selectFrom(prompts, opts = {}) {
-  const { scope, mode = 'sequential', done, prevTerm, rand = Math.random } = opts;
+  const { scope, mode = 'sequential', done, prev, rand = Math.random } = opts;
   const pool = filterByScope(prompts, scope);
   if (pool.length === 0) return null;
 
   if (mode === 'random') {
-    const others = pool.length > 1 && prevTerm ? pool.filter((p) => p.term !== prevTerm) : pool;
+    const others = pool.length > 1 && prev ? pool.filter((p) => promptId(p) !== prev) : pool;
     const list = others.length ? others : pool;
     return list[Math.floor(rand() * list.length)] ?? null;
   }
 
   const doneSet = done instanceof Set ? done : new Set(done || []);
-  const undone = pool.filter((p) => !doneSet.has(p.term));
+  const undone = pool.filter((p) => !doneSet.has(promptId(p)));
   if (undone.length) {
-    return undone.find((p) => p.term !== prevTerm) ?? undone[0];
+    return undone.find((p) => promptId(p) !== prev) ?? undone[0];
   }
-  // Everything in scope is done — review in curriculum order, skipping prevTerm.
-  return pool.find((p) => p.term !== prevTerm) ?? pool[0];
+  // Everything in scope is done — review in order, advancing past `prev` cyclically
+  // so the whole pool is revisited (not just the first one or two prompts).
+  if (!prev) return pool[0];
+  const i = pool.findIndex((p) => promptId(p) === prev);
+  return i === -1 ? pool[0] : pool[(i + 1) % pool.length];
 }
 
 // Flat list for the range <select>; the UI groups entries by `week`.

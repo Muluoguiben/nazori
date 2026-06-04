@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { audioFilenameFromMime } from '@/lib/audio-format.mjs';
 import {
+  idsForDoneTerms,
   parseScope,
   progressFor,
+  promptId,
   scopeChoices,
   scopeToValue,
   selectPrompt,
@@ -71,10 +73,12 @@ export default function RepPage() {
   const doneRef = useRef<Set<string>>(new Set());
   const scopeRef = useRef(scope);
   const modeRef = useRef(mode);
+  const phaseRef = useRef(phase);
   useEffect(() => {
     scopeRef.current = scope;
     modeRef.current = mode;
-  }, [scope, mode]);
+    phaseRef.current = phase;
+  }, [scope, mode, phase]);
 
   const persistDone = useCallback(() => {
     try {
@@ -88,10 +92,11 @@ export default function RepPage() {
     setProgress(progressFor(scopeRef.current, doneRef.current));
   }, []);
 
-  // A term is "done" once attempted or skipped; this advances sequential mode.
+  // A prompt is "done" once attempted or skipped; this advances sequential mode.
+  // Keyed by prompt id (not term) so repeated terms stay independent.
   const markDone = useCallback(
-    (term: string) => {
-      doneRef.current.add(term);
+    (p: Prompt) => {
+      doneRef.current.add(promptId(p));
       persistDone();
       refreshProgress();
     },
@@ -125,15 +130,33 @@ export default function RepPage() {
     }
     /* eslint-enable react-hooks/set-state-in-effect */
 
-    // Merge server-side progress (cross-device source of truth) when DB is configured.
+    // Merge server-side progress (cross-device source of truth) when DB is
+    // configured. The server stores only terms; map them to prompt ids first.
     let active = true;
     fetch('/api/progress')
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { done?: string[] } | null) => {
         if (!active || !d?.done?.length) return;
-        for (const t of d.done) doneRef.current.add(t);
+        let added = false;
+        for (const id of idsForDoneTerms(d.done)) {
+          if (!doneRef.current.has(id)) {
+            doneRef.current.add(id);
+            added = true;
+          }
+        }
+        if (!added) return;
         persistDone();
         setProgress(progressFor(scopeRef.current, doneRef.current));
+        // Resume where the user left off: in sequential mode jump to the first
+        // not-done prompt, but only while still idle on the initial pick.
+        if (modeRef.current === 'sequential' && phaseRef.current === 'idle') {
+          const resumed = selectPrompt({
+            scope: scopeRef.current,
+            mode: 'sequential',
+            done: doneRef.current,
+          });
+          if (resumed) setPrompt(resumed);
+        }
       })
       .catch(() => {});
     return () => {
@@ -191,7 +214,7 @@ export default function RepPage() {
         if (!mountedRef.current) return;
         setResult(evaluation);
         setRepCount((c) => c + 1);
-        markDone(current.term);
+        markDone(current);
         lastTakeRef.current = null;
         setPhase('feedback');
       } catch (err) {
@@ -260,21 +283,21 @@ export default function RepPage() {
           scope: scopeRef.current,
           mode: modeRef.current,
           done: doneRef.current,
-          prevTerm: p?.term,
+          prev: p ? promptId(p) : undefined,
         }) ?? p,
     );
     setPhase('idle');
   }, [clearTimers, stopStream]);
 
   const skipConcept = useCallback(() => {
-    const term = prompt?.term;
-    if (term) {
+    const p = prompt;
+    if (p) {
       void fetch('/api/skip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ term }),
+        body: JSON.stringify({ term: p.term }),
       }).catch(() => {});
-      markDone(term);
+      markDone(p);
     }
     nextPrompt();
   }, [prompt, nextPrompt, markDone]);
@@ -290,7 +313,7 @@ export default function RepPage() {
     setProgress(progressFor(sc, doneRef.current));
     setPrompt(
       (p) =>
-        selectPrompt({ scope: sc, mode: modeRef.current, done: doneRef.current, prevTerm: p?.term }) ??
+        selectPrompt({ scope: sc, mode: modeRef.current, done: doneRef.current, prev: p ? promptId(p) : undefined }) ??
         p,
     );
   }, []);
@@ -305,7 +328,7 @@ export default function RepPage() {
     }
     setPrompt(
       (p) =>
-        selectPrompt({ scope: scopeRef.current, mode: md, done: doneRef.current, prevTerm: p?.term }) ??
+        selectPrompt({ scope: scopeRef.current, mode: md, done: doneRef.current, prev: p ? promptId(p) : undefined }) ??
         p,
     );
   }, []);
