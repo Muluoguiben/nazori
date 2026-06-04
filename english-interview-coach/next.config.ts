@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    "/cards": ["./curriculum/**/*.md"],
+  },
   async headers() {
     return [
       {

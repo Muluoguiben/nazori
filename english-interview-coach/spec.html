@@ -100,7 +100,6 @@
 <h3>Out of v0 (deferred to v1+)</h3>
 <ul>
 <li>Mock interview mode (multi-turn, follow-up questions, interviewer voice)</li>
-<li>Quick mode (flashcards, vocab drills) — using Anki instead</li>
 <li>Reference answers (we use freestyle judgment first; add references if scoring drifts)</li>
 <li>Audio storage and playback</li>
 <li>Progress trend analytics</li>
@@ -131,7 +130,7 @@
 <tr>
 <td>2</td>
 <td>Quick mode</td>
-<td>Use Anki (free on Android). Build Deep only.</td>
+<td>In-app <code>/cards</code>: tap-to-flip flashcards from <code>curriculum/week1-6.md</code>. No SRS — sequential browse of all 390 terms.</td>
 </tr>
 <tr>
 <td>3</td>
@@ -176,11 +175,11 @@
 </tbody></table>
 <hr>
 <h2>Daily UX</h2>
-<h3>Quick mode (Anki, separately)</h3>
+<h3>Quick mode (in-app <code>/cards</code>)</h3>
 <ul>
-<li>10–20 cards/day from a deck built from <code>week1.md</code></li>
-<li>Done on phone, anywhere, silently</li>
-<li>~5–10 minutes</li>
+<li>Tap-to-flip flashcards sourced from <code>curriculum/week1.md</code>–<code>week6.md</code></li>
+<li>All six weeks (390 terms) available; sequential browse, no SRS</li>
+<li>Done on phone, anywhere, silently; ~5–10 minutes</li>
 </ul>
 <h3>Deep mode (this app)</h3>
 <ul>
@@ -326,11 +325,11 @@ Return:
 </tr>
 <tr>
 <td>v2.0</td>
-<td>Fold vocab/flashcards back into the app (replace Anki dependency)</td>
+<td>LLM-generated prompts (Method C from Q6) for topic variety</td>
 </tr>
 <tr>
 <td>v2.0</td>
-<td>LLM-generated prompts (Method C from Q6) for topic variety</td>
+<td>Spaced-repetition scheduler on top of <code>/cards</code> (currently sequential only)</td>
 </tr>
 </tbody></table>
 <hr>

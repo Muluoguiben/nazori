@@ -24,7 +24,6 @@ User is a 3–4 year full-stack engineer actively searching for AI Agent roles f
 
 ### Out of v0 (deferred to v1+)
 - Mock interview mode (multi-turn, follow-up questions, interviewer voice)
-- Quick mode (flashcards, vocab drills) — using Anki instead
 - Reference answers (we use freestyle judgment first; add references if scoring drifts)
 - Audio storage and playback
 - Progress trend analytics
@@ -45,7 +44,7 @@ User is a 3–4 year full-stack engineer actively searching for AI Agent roles f
 | # | Decision | Choice |
 |---|---|---|
 | 1 | Daily routine | Two-mode split: Quick (silent, anywhere) + Deep (speaking, home) |
-| 2 | Quick mode | Use Anki (free on Android). Build Deep only. |
+| 2 | Quick mode | In-app `/cards`: tap-to-flip flashcards from `curriculum/week1-6.md`. No SRS — sequential browse of all 390 terms. |
 | 3 | Deep v0 scope | Explanation reps only. Mock interview is v1. |
 | 4 | Feedback format | Transcript with inline corrections + 3 specific fixes |
 | 5 | Audio UX | Tap to start, 90s hard limit, auto-submit |
@@ -59,10 +58,10 @@ User is a 3–4 year full-stack engineer actively searching for AI Agent roles f
 
 ## Daily UX
 
-### Quick mode (Anki, separately)
-- 10–20 cards/day from a deck built from `week1.md`
-- Done on phone, anywhere, silently
-- ~5–10 minutes
+### Quick mode (in-app `/cards`)
+- Tap-to-flip flashcards sourced from `curriculum/week1.md`–`week6.md`
+- All six weeks (390 terms) available; sequential browse, no SRS
+- Done on phone, anywhere, silently; ~5–10 minutes
 
 ### Deep mode (this app)
 - One fixed evening slot, at home
@@ -205,8 +204,8 @@ Estimated total: **15–20 hours focused work**, realistic over 2–3 weekends.
 | v0.5 | Reference answers (Method B from Q9) for prompts with inconsistent scoring |
 | v1.0 | Mock interview mode: multi-turn, follow-up questions, interviewer TTS voice, feedback at session end |
 | v1.5 | Progress trends: weekly score deltas, retention rate per concept |
-| v2.0 | Fold vocab/flashcards back into the app (replace Anki dependency) |
 | v2.0 | LLM-generated prompts (Method C from Q6) for topic variety |
+| v2.0 | Spaced-repetition scheduler on top of `/cards` (currently sequential only) |
 
 ---
 

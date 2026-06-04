@@ -45,6 +45,12 @@ export default function Home() {
         >
           Start session
         </Link>
+        <Link
+          href="/cards"
+          className="mt-2 block w-full rounded-2xl bg-neutral-900 px-6 py-4 text-center text-base font-medium text-neutral-200 ring-1 ring-neutral-800 transition active:scale-[0.99]"
+        >
+          Browse flashcards
+        </Link>
         <InstallHint />
       </div>
     </main>
