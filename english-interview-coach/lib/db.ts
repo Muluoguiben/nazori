@@ -2,6 +2,7 @@ import { neon } from '@neondatabase/serverless';
 import {
   INSERT_REP,
   INSERT_SKIP,
+  SELECT_DONE_TERMS,
   SELECT_RECENT_REPS,
   SELECT_REP_TIMES,
   SELECT_REP_TOTAL,
@@ -44,6 +45,14 @@ export async function saveSkip(term: string): Promise<void> {
   const sql = getSql();
   if (!sql) return;
   await sql.query(INSERT_SKIP, [term]);
+}
+
+// Terms already attempted or skipped — used to drive sequential progress.
+export async function getDoneTerms(): Promise<string[]> {
+  const sql = getSql();
+  if (!sql) return [];
+  const rows = await sql.query(SELECT_DONE_TERMS);
+  return (rows as unknown as { prompt_term: string }[]).map((r) => r.prompt_term);
 }
 
 export type RepRow = {

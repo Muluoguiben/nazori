@@ -1,5 +1,9 @@
 export type Prompt = { term: string; prompt: string; tag: string };
 
+export type Scope = { type: 'all' } | { type: 'week'; week: number } | { type: 'tag'; tag: string };
+
+export type Mode = 'sequential' | 'random';
+
 export type Scores = {
   accuracy: number;
   structure: number;

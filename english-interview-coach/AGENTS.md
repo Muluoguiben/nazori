@@ -11,9 +11,9 @@ A phone-first PWA to practice explaining tech concepts out loud in English, for 
 ## What's done (v0 build complete)
 
 - **Spec:** `spec.md` (10 v0 design decisions locked 2026-05-27). HTML view at `spec.html`.
-- **Curriculum:** all six weeks drafted — `curriculum/week1.md`–`week6.md` (65 terms each, 390 total). `prompts.json` wires 20 Week-1 concepts for v0.
+- **Curriculum:** all six weeks drafted — `curriculum/week1.md`–`week6.md` (65 terms each, 390 total). `prompts.json` wires all 390 terms, tagged by topic (36 group tags across the six weeks).
 - **App:** Next.js 16 (App Router) + React 19 + Tailwind v4 PWA.
-  1. `prompts.json` from Week 1 — done.
+  1. `prompts.json` — all 390 curriculum terms wired (Week 1's original 20 prompts preserved verbatim). `/rep` has a range selector (week/tag) + in-order progress derived from `reps`∪`skipped` via `/api/progress`.
   2. PWA scaffold — manifest, icons, service worker (`app/`, `public/`).
   3. Happy-path rep — `/rep`: 90s record → Whisper (`/api/transcribe`) → Claude Sonnet 4.6 (`/api/evaluate`, cached rubric + json_schema) → feedback.
   4. Neon Postgres — `db/schema.sql` (`reps`, `skipped_concepts`), `lib/db.ts`, `/api/skip`, `/api/history`, `scripts/migrate.mjs`.
@@ -26,7 +26,6 @@ Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gr
 ## What's left
 
 - **Deploy to Vercel:** set the project root to `english-interview-coach`; add env `APP_SECRET`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL`; run `npm run db:migrate` once. See `.env.example`.
-- **Wire more prompts** — `prompts.json` covers 20 Week-1 concepts; weeks 2–6 (drafted) aren't wired yet.
 - Deferred to v1+ (do not scope-creep into v0): mock interview mode, reference answers, progress trends.
 
 ## Design principles (do not violate)
@@ -48,7 +47,7 @@ Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gr
 
 ```
 spec.md                  v0 design (read first)
-prompts.json             20 Week 1 prompts (term, prompt, tag)
+prompts.json             390 prompts across 6 weeks (term, prompt, tag)
 curriculum/week{1..6}.md vocab content (390 terms)
 app/                     App Router: home, /rep, /login, /api/*
 lib/                     db, auth, prompts, stats, types
