@@ -6,6 +6,7 @@ import { PGlite } from '@electric-sql/pglite';
 import {
   INSERT_REP,
   INSERT_SKIP,
+  SELECT_DONE_TERMS,
   SELECT_RECENT_REPS,
   SELECT_REP_TIMES,
   SELECT_REP_TOTAL,
@@ -47,6 +48,12 @@ const ok =
 const skips = await db.query('SELECT prompt_term FROM skipped_concepts');
 const skipOk = skips.rows.length === 1 && skips.rows[0].prompt_term === 'monads';
 
+// Done terms = attempted (reps) UNION skipped, de-duplicated. At this point that
+// is exactly {closure, monads} before the streak fixtures below are inserted.
+const doneTerms = (await db.query(SELECT_DONE_TERMS)).rows.map((r) => r.prompt_term).sort();
+const doneOk =
+  doneTerms.length === 2 && doneTerms[0] === 'closure' && doneTerms[1] === 'monads';
+
 // Streak: add reps on today, yesterday, and the day before (one rep already
 // exists for today from the insert above), then verify the streak query and
 // computation report 3 consecutive days.
@@ -75,9 +82,14 @@ const streakOk = stats.streak === 3 && stats.today >= 1 && stats.total === times
 
 await db.close();
 
-if (!ok || !skipOk || !streakOk) {
-  console.error('schema check FAILED', { row, skips: skips.rows, stats });
+if (!ok || !skipOk || !doneOk || !streakOk) {
+  console.error('schema check FAILED', { row, skips: skips.rows, doneTerms, stats });
   process.exit(1);
 }
 
-console.log('schema check OK — reps + skipped_concepts round-trip and streak =', stats.streak);
+console.log(
+  'schema check OK — reps + skipped_concepts round-trip, done-terms =',
+  doneTerms.join('+'),
+  'and streak =',
+  stats.streak,
+);

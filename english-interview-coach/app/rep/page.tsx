@@ -3,10 +3,19 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { audioFilenameFromMime } from '@/lib/audio-format.mjs';
-import { randomPrompt } from '@/lib/prompts';
-import type { EvalResult, Prompt } from '@/lib/types';
+import {
+  parseScope,
+  progressFor,
+  scopeChoices,
+  scopeToValue,
+  selectPrompt,
+  weekTitles,
+  weeks,
+} from '@/lib/prompts';
+import type { EvalResult, Mode, Prompt, Scope } from '@/lib/types';
 
 const MAX_SECONDS = 90;
+const SCOPE_CHOICES = scopeChoices();
 
 type Phase = 'idle' | 'recording' | 'processing' | 'feedback' | 'error';
 
@@ -43,6 +52,10 @@ export default function RepPage() {
   const [canRetry, setCanRetry] = useState(false);
   const [repCount, setRepCount] = useState(0);
 
+  const [scope, setScope] = useState<Scope>({ type: 'all' });
+  const [mode, setMode] = useState<Mode>('sequential');
+  const [progress, setProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
+
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -52,18 +65,81 @@ export default function RepPage() {
   const lastTakeRef = useRef<{ blob: Blob; durationSec: number } | null>(null);
   const mountedRef = useRef(true);
 
+  // Refs mirror scope/mode/done so the stable callbacks below always read the
+  // latest selection without being torn down on every change. They are synced in
+  // an effect (not during render) per the react-hooks/refs rule.
+  const doneRef = useRef<Set<string>>(new Set());
+  const scopeRef = useRef(scope);
+  const modeRef = useRef(mode);
   useEffect(() => {
-    const first = randomPrompt();
-    /* eslint-disable react-hooks/set-state-in-effect -- client-only first prompt avoids an SSR/hydration mismatch */
+    scopeRef.current = scope;
+    modeRef.current = mode;
+  }, [scope, mode]);
+
+  const persistDone = useCallback(() => {
+    try {
+      localStorage.setItem('eic:done', JSON.stringify([...doneRef.current]));
+    } catch {
+      // localStorage may be unavailable (private mode); progress still works in-memory.
+    }
+  }, []);
+
+  const refreshProgress = useCallback(() => {
+    setProgress(progressFor(scopeRef.current, doneRef.current));
+  }, []);
+
+  // A term is "done" once attempted or skipped; this advances sequential mode.
+  const markDone = useCallback(
+    (term: string) => {
+      doneRef.current.add(term);
+      persistDone();
+      refreshProgress();
+    },
+    [persistDone, refreshProgress],
+  );
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- client-only init avoids an SSR/hydration mismatch */
+    let sc: Scope = { type: 'all' };
+    let md: Mode = 'sequential';
+    try {
+      const sv = localStorage.getItem('eic:scope');
+      if (sv) sc = parseScope(sv);
+      const mv = localStorage.getItem('eic:mode');
+      if (mv === 'random' || mv === 'sequential') md = mv;
+      const dv = localStorage.getItem('eic:done');
+      if (dv) doneRef.current = new Set(JSON.parse(dv) as string[]);
+    } catch {
+      // Ignore corrupt/unavailable storage and fall back to defaults.
+    }
+    setScope(sc);
+    setMode(md);
+    const first = selectPrompt({ scope: sc, mode: md, done: doneRef.current });
     if (first) {
       setPrompt(first);
+      setProgress(progressFor(sc, doneRef.current));
     } else {
       setErrorMsg('No practice prompts are available.');
       setCanRetry(false);
       setPhase('error');
     }
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+
+    // Merge server-side progress (cross-device source of truth) when DB is configured.
+    let active = true;
+    fetch('/api/progress')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { done?: string[] } | null) => {
+        if (!active || !d?.done?.length) return;
+        for (const t of d.done) doneRef.current.add(t);
+        persistDone();
+        setProgress(progressFor(scopeRef.current, doneRef.current));
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [persistDone]);
 
   const clearTimers = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -115,6 +191,7 @@ export default function RepPage() {
         if (!mountedRef.current) return;
         setResult(evaluation);
         setRepCount((c) => c + 1);
+        markDone(current.term);
         lastTakeRef.current = null;
         setPhase('feedback');
       } catch (err) {
@@ -124,7 +201,7 @@ export default function RepPage() {
         setPhase('error');
       }
     },
-    [prompt],
+    [prompt, markDone],
   );
 
   const stopRecording = useCallback(() => {
@@ -177,7 +254,15 @@ export default function RepPage() {
     setErrorMsg('');
     setCanRetry(false);
     setSecondsLeft(MAX_SECONDS);
-    setPrompt((p) => randomPrompt(p?.term));
+    setPrompt(
+      (p) =>
+        selectPrompt({
+          scope: scopeRef.current,
+          mode: modeRef.current,
+          done: doneRef.current,
+          prevTerm: p?.term,
+        }) ?? p,
+    );
     setPhase('idle');
   }, [clearTimers, stopStream]);
 
@@ -189,9 +274,41 @@ export default function RepPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ term }),
       }).catch(() => {});
+      markDone(term);
     }
     nextPrompt();
-  }, [prompt, nextPrompt]);
+  }, [prompt, nextPrompt, markDone]);
+
+  const onScopeChange = useCallback((value: string) => {
+    const sc = parseScope(value);
+    setScope(sc);
+    try {
+      localStorage.setItem('eic:scope', value);
+    } catch {
+      // non-fatal
+    }
+    setProgress(progressFor(sc, doneRef.current));
+    setPrompt(
+      (p) =>
+        selectPrompt({ scope: sc, mode: modeRef.current, done: doneRef.current, prevTerm: p?.term }) ??
+        p,
+    );
+  }, []);
+
+  const toggleMode = useCallback(() => {
+    const md: Mode = modeRef.current === 'sequential' ? 'random' : 'sequential';
+    setMode(md);
+    try {
+      localStorage.setItem('eic:mode', md);
+    } catch {
+      // non-fatal
+    }
+    setPrompt(
+      (p) =>
+        selectPrompt({ scope: scopeRef.current, mode: md, done: doneRef.current, prevTerm: p?.term }) ??
+        p,
+    );
+  }, []);
 
   // Re-run transcribe + evaluate on the recording we already captured.
   const retry = useCallback(() => {
@@ -223,6 +340,8 @@ export default function RepPage() {
     [clearTimers, stopStream],
   );
 
+  const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
+
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-1 flex-col px-6 pb-10 pt-[max(1.5rem,env(safe-area-inset-top))]">
       <header className="flex items-center justify-between py-2 text-sm text-neutral-500">
@@ -231,6 +350,49 @@ export default function RepPage() {
         </Link>
         <span>Reps: {repCount}</span>
       </header>
+
+      {phase === 'idle' && (
+        <div className="mt-4 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <select
+              aria-label="Practice range"
+              value={scopeToValue(scope)}
+              onChange={(e) => onScopeChange(e.target.value)}
+              className="min-w-0 flex-1 rounded-lg bg-neutral-900 px-3 py-2 text-sm text-neutral-200 ring-1 ring-neutral-800"
+            >
+              <option value="all">All weeks · 390</option>
+              {weeks.map((w) => (
+                <optgroup key={w} label={`Week ${w} · ${weekTitles[w]}`}>
+                  {SCOPE_CHOICES.filter((c) => c.week === w).map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.whole ? `Whole week ${w}` : c.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={toggleMode}
+              aria-label={`Order: ${mode === 'sequential' ? 'in order' : 'shuffle'}`}
+              className="shrink-0 rounded-lg bg-neutral-900 px-3 py-2 text-xs text-neutral-300 ring-1 ring-neutral-800 transition active:scale-[0.98]"
+            >
+              {mode === 'sequential' ? 'In order' : 'Shuffle'}
+            </button>
+          </div>
+          <div className="flex items-center gap-2 text-[11px] text-neutral-500">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-800">
+              <div
+                className="h-full rounded-full bg-blue-600 transition-[width]"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <span className="tabular-nums">
+              {progress.done}/{progress.total}
+            </span>
+          </div>
+        </div>
+      )}
 
       {phase !== 'feedback' && (
         <section className="mt-6">

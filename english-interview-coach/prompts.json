@@ -1,77 +1,42 @@
 [
   {
-    "term": "closure",
-    "prompt": "Explain closure in 60 seconds, with an example of when you would use one.",
-    "tag": "js-core"
+    "term": "type annotation",
+    "prompt": "Explain what a type annotation like `name: string` does in 60 seconds, and give an example of a bug it caught for you.",
+    "tag": "ts-types"
   },
   {
-    "term": "hoisting",
-    "prompt": "Explain hoisting in 60 seconds. Mention what is different between var, let, and function declarations.",
-    "tag": "js-core"
+    "term": "interface",
+    "prompt": "Describe what an `interface` is in TypeScript in 60 seconds, with an example of a shape you would model with one.",
+    "tag": "ts-types"
   },
   {
-    "term": "this binding",
-    "prompt": "Explain how `this` is bound in JavaScript. Mention arrow functions vs regular functions.",
-    "tag": "js-core"
+    "term": "type alias",
+    "prompt": "Compare a `type` alias and an `interface`. When would you reach for one over the other?",
+    "tag": "ts-types"
   },
   {
-    "term": "prototype chain",
-    "prompt": "Explain the prototype chain in 60 seconds, with an example lookup.",
-    "tag": "js-core"
+    "term": "union type",
+    "prompt": "Explain a union type like `string | number` in 60 seconds. How do you safely work with the value inside?",
+    "tag": "ts-types"
   },
   {
-    "term": "lexical scope",
-    "prompt": "Explain lexical scope in 60 seconds. Why does it matter for closures?",
-    "tag": "js-core"
+    "term": "intersection type",
+    "prompt": "Walk me through what an intersection type written with `&` gives you, with an example of when combining two types is useful.",
+    "tag": "ts-types"
   },
   {
-    "term": "immutability",
-    "prompt": "Explain immutability in 60 seconds. Why does it matter in React state?",
-    "tag": "js-core"
-  },
-  {
-    "term": "event loop",
-    "prompt": "Walk me through what the event loop does, in 60 seconds.",
-    "tag": "async"
-  },
-  {
-    "term": "race condition",
-    "prompt": "Explain race condition in 60 seconds, with a real example.",
-    "tag": "async"
-  },
-  {
-    "term": "Promise",
-    "prompt": "Explain a Promise in 60 seconds. What states can it be in?",
-    "tag": "async"
-  },
-  {
-    "term": "async/await",
-    "prompt": "Explain async/await in 60 seconds. How does it differ from chaining .then()?",
-    "tag": "async"
-  },
-  {
-    "term": "Promise.all",
-    "prompt": "Explain Promise.all in 60 seconds. When would you use it instead of sequential awaits?",
-    "tag": "async"
-  },
-  {
-    "term": "microtask vs macrotask",
-    "prompt": "Compare microtasks and macrotasks. Which one runs first and why?",
-    "tag": "async"
-  },
-  {
-    "term": "throttle vs debounce",
-    "prompt": "Compare throttle and debounce. When would you use each one?",
-    "tag": "async"
-  },
-  {
-    "term": "concurrency vs parallelism",
-    "prompt": "Compare concurrency and parallelism. Does JavaScript have one, both, or neither?",
-    "tag": "async"
+    "term": "literal type",
+    "prompt": "Explain a literal type like `\"open\" | \"closed\"` in 60 seconds. Why is it better than just `string` here?",
+    "tag": "ts-types"
   },
   {
     "term": "generic",
     "prompt": "Explain TypeScript generics in 60 seconds, with an example of a generic function.",
+    "tag": "ts-types"
+  },
+  {
+    "term": "type guard",
+    "prompt": "Describe what a type guard like `isError(x): x is Error` does in 60 seconds, with an example of where you needed one.",
     "tag": "ts-types"
   },
   {
@@ -85,9 +50,179 @@
     "tag": "ts-types"
   },
   {
+    "term": "utility type",
+    "prompt": "Explain when you would reach for a utility type like `Partial`, `Pick`, or `Omit`, with a concrete example.",
+    "tag": "ts-types"
+  },
+  {
+    "term": "readonly",
+    "prompt": "Describe what `readonly` does in 60 seconds. Why does it matter for keeping a config object safe?",
+    "tag": "ts-types"
+  },
+  {
+    "term": "type assertion",
+    "prompt": "Explain what a type assertion with `as` does in 60 seconds, and tell me when you should avoid it.",
+    "tag": "ts-types"
+  },
+  {
     "term": "unknown vs any",
     "prompt": "Compare `unknown` and `any` in TypeScript. When would you use `unknown`?",
     "tag": "ts-types"
+  },
+  {
+    "term": "never type",
+    "prompt": "Explain the `never` type in 60 seconds, with an example of how it helps you write an exhaustive `switch`.",
+    "tag": "ts-types"
+  },
+  {
+    "term": "closure",
+    "prompt": "Explain closure in 60 seconds, with an example of when you would use one.",
+    "tag": "js-core"
+  },
+  {
+    "term": "hoisting",
+    "prompt": "Explain hoisting in 60 seconds. Mention what is different between var, let, and function declarations.",
+    "tag": "js-core"
+  },
+  {
+    "term": "lexical scope",
+    "prompt": "Explain lexical scope in 60 seconds. Why does it matter for closures?",
+    "tag": "js-core"
+  },
+  {
+    "term": "this binding",
+    "prompt": "Explain how `this` is bound in JavaScript. Mention arrow functions vs regular functions.",
+    "tag": "js-core"
+  },
+  {
+    "term": "prototype chain",
+    "prompt": "Explain the prototype chain in 60 seconds, with an example lookup.",
+    "tag": "js-core"
+  },
+  {
+    "term": "destructuring",
+    "prompt": "Explain destructuring in 60 seconds, with an example of pulling fields out of an object or array.",
+    "tag": "js-core"
+  },
+  {
+    "term": "spread operator",
+    "prompt": "Explain what the `...` spread operator does, and why it matters when you want to keep state immutable.",
+    "tag": "js-core"
+  },
+  {
+    "term": "rest parameter",
+    "prompt": "Walk me through the `...args` rest parameter in 60 seconds. When would you use it to build a flexible function?",
+    "tag": "js-core"
+  },
+  {
+    "term": "optional chaining",
+    "prompt": "Explain optional chaining `?.` in 60 seconds, with an example of safely reading a deeply nested value.",
+    "tag": "js-core"
+  },
+  {
+    "term": "nullish coalescing",
+    "prompt": "Compare `??` and `||` for setting a default. When does using `||` instead of `??` cause a bug?",
+    "tag": "js-core"
+  },
+  {
+    "term": "truthy / falsy",
+    "prompt": "Explain truthy and falsy values in 60 seconds, with an example of a bug where a falsy value like `0` was skipped by mistake.",
+    "tag": "js-core"
+  },
+  {
+    "term": "reference vs value",
+    "prompt": "Explain the difference between copy by value and share by reference, and why it matters for `===` and React state.",
+    "tag": "js-core"
+  },
+  {
+    "term": "shallow copy vs deep copy",
+    "prompt": "Compare a shallow copy and a deep copy. What is the tradeoff, and when does a shallow copy leak changes?",
+    "tag": "js-core"
+  },
+  {
+    "term": "immutability",
+    "prompt": "Explain immutability in 60 seconds. Why does it matter in React state?",
+    "tag": "js-core"
+  },
+  {
+    "term": "side effect",
+    "prompt": "Describe what a side effect is, with an example, and why it matters for pure functions and `useEffect`.",
+    "tag": "js-core"
+  },
+  {
+    "term": "event loop",
+    "prompt": "Walk me through what the event loop does, in 60 seconds.",
+    "tag": "async"
+  },
+  {
+    "term": "call stack",
+    "prompt": "Explain what the call stack is in 60 seconds, with an example of how it relates to the event loop.",
+    "tag": "async"
+  },
+  {
+    "term": "callback",
+    "prompt": "Describe what a callback is in 60 seconds, with an example of when you would pass one.",
+    "tag": "async"
+  },
+  {
+    "term": "callback hell",
+    "prompt": "Explain what callback hell is and why it is a problem. How would you refactor it?",
+    "tag": "async"
+  },
+  {
+    "term": "Promise",
+    "prompt": "Explain a Promise in 60 seconds. What states can it be in?",
+    "tag": "async"
+  },
+  {
+    "term": "resolve / reject",
+    "prompt": "Walk me through how a Promise finishes with `resolve` versus `reject`, with an example of each.",
+    "tag": "async"
+  },
+  {
+    "term": "async / await",
+    "prompt": "Explain async/await in 60 seconds. How does it differ from chaining .then()?",
+    "tag": "async"
+  },
+  {
+    "term": "race condition",
+    "prompt": "Explain race condition in 60 seconds, with a real example.",
+    "tag": "async"
+  },
+  {
+    "term": "Promise.all",
+    "prompt": "Explain Promise.all in 60 seconds. When would you use it instead of sequential awaits?",
+    "tag": "async"
+  },
+  {
+    "term": "Promise.race",
+    "prompt": "Walk me through how `Promise.race` works, with an example such as racing a fetch against a timeout.",
+    "tag": "async"
+  },
+  {
+    "term": "microtask vs macrotask",
+    "prompt": "Compare microtasks and macrotasks. Which one runs first and why?",
+    "tag": "async"
+  },
+  {
+    "term": "throttle",
+    "prompt": "Explain what throttle does in 60 seconds, with an example like a scroll handler.",
+    "tag": "async"
+  },
+  {
+    "term": "debounce",
+    "prompt": "Compare debounce and throttle. When would you pick `debounce` for a search input?",
+    "tag": "async"
+  },
+  {
+    "term": "concurrency vs parallelism",
+    "prompt": "Compare concurrency and parallelism. Does JavaScript have one, both, or neither?",
+    "tag": "async"
+  },
+  {
+    "term": "blocking vs non-blocking",
+    "prompt": "Explain blocking versus non-blocking code in 60 seconds, with an example like `readFileSync` versus `readFile`.",
+    "tag": "async"
   },
   {
     "term": "pure function",
@@ -95,8 +230,1723 @@
     "tag": "functions"
   },
   {
+    "term": "higher-order function",
+    "prompt": "Walk me through what a higher-order function is, with a concrete example like `map` or a function that returns another function.",
+    "tag": "functions"
+  },
+  {
+    "term": "arrow function",
+    "prompt": "Compare an arrow function with a normal function. Why does `this` behave differently, and when does that matter?",
+    "tag": "functions"
+  },
+  {
+    "term": "currying",
+    "prompt": "Explain currying in 60 seconds, using `add(a)(b)` or your own example. When is it actually useful?",
+    "tag": "functions"
+  },
+  {
     "term": "memoization",
     "prompt": "Explain memoization in 60 seconds. When is it worth doing?",
     "tag": "functions"
+  },
+  {
+    "term": "recursion",
+    "prompt": "Walk me through how you would solve a problem with recursion, and explain why the base case matters.",
+    "tag": "functions"
+  },
+  {
+    "term": "IIFE",
+    "prompt": "Describe what an IIFE is and what problem it solved in older code, in 60 seconds.",
+    "tag": "functions"
+  },
+  {
+    "term": "closure-over-loop bug",
+    "prompt": "Walk me through the closure-over-loop bug with `var`, and explain why switching to `let` fixes it.",
+    "tag": "functions"
+  },
+  {
+    "term": "bind / call / apply",
+    "prompt": "Compare `bind`, `call`, and `apply` for setting `this`. Give an example of when you'd reach for `.bind`.",
+    "tag": "functions"
+  },
+  {
+    "term": "default parameter",
+    "prompt": "Explain default parameters in 60 seconds. What value triggers the default, and why does that detail matter?",
+    "tag": "functions"
+  },
+  {
+    "term": "try / catch",
+    "prompt": "Explain how `try / catch` works in 60 seconds, with an example of a case where you would reach for it.",
+    "tag": "errors"
+  },
+  {
+    "term": "throw an error",
+    "prompt": "Walk me through when you would `throw` an error on purpose instead of returning a value, and why that choice matters.",
+    "tag": "errors"
+  },
+  {
+    "term": "stack trace",
+    "prompt": "Describe how you read a stack trace to find a bug. Walk me through one debugging story where it pointed you to the root cause.",
+    "tag": "errors"
+  },
+  {
+    "term": "unhandled rejection",
+    "prompt": "Walk me through what an unhandled rejection is and how you would catch one. What's the tradeoff if you ignore them?",
+    "tag": "errors"
+  },
+  {
+    "term": "error boundary",
+    "prompt": "Explain what a React error boundary does in 60 seconds. When would you wrap part of the UI in one?",
+    "tag": "errors"
+  },
+  {
+    "term": "import / export",
+    "prompt": "Explain how `import` and `export` work to share code between files, in 60 seconds, with a short example of importing one helper into another file.",
+    "tag": "modules"
+  },
+  {
+    "term": "default export vs named export",
+    "prompt": "Compare a default export with named exports. Which do you prefer in your own code, and why?",
+    "tag": "modules"
+  },
+  {
+    "term": "dynamic import",
+    "prompt": "Walk me through what a dynamic `import()` does and why it returns a Promise. Give an example of when you would reach for it.",
+    "tag": "modules"
+  },
+  {
+    "term": "tree shaking",
+    "prompt": "Describe tree shaking in 60 seconds. Why does it matter for bundle size, and how do your exports affect it?",
+    "tag": "modules"
+  },
+  {
+    "term": "tsconfig (compile target)",
+    "prompt": "Walk me through what the `target` setting in `tsconfig` controls. What changes when you compile to an older JS version like `es5`?",
+    "tag": "modules"
+  },
+  {
+    "term": "component",
+    "prompt": "Explain what a React component is in 60 seconds, with an example of how you split a page into smaller ones.",
+    "tag": "react-core"
+  },
+  {
+    "term": "JSX",
+    "prompt": "Walk me through what JSX is and how it relates to the JavaScript that actually runs.",
+    "tag": "react-core"
+  },
+  {
+    "term": "props",
+    "prompt": "Explain props in 60 seconds. How does data flow between a parent and a child component?",
+    "tag": "react-core"
+  },
+  {
+    "term": "children",
+    "prompt": "Describe what `children` is in React, with an example of when you would reach for it instead of a regular prop.",
+    "tag": "react-core"
+  },
+  {
+    "term": "fragment",
+    "prompt": "Walk me through why you would use a fragment instead of wrapping siblings in a `<div>`. What problem does it solve?",
+    "tag": "react-core"
+  },
+  {
+    "term": "conditional rendering",
+    "prompt": "Explain conditional rendering in 60 seconds, with an example like showing a spinner while data loads.",
+    "tag": "react-core"
+  },
+  {
+    "term": "list rendering",
+    "prompt": "Walk me through how you render a list from an array in React. What does `.map()` do here?",
+    "tag": "react-core"
+  },
+  {
+    "term": "key prop",
+    "prompt": "Explain why the `key` prop matters when rendering a list. Why is using the array index often a bad idea?",
+    "tag": "react-core"
+  },
+  {
+    "term": "ref",
+    "prompt": "Describe what a `ref` is and when you would use one. Why does changing it not trigger a re-render?",
+    "tag": "react-core"
+  },
+  {
+    "term": "portal",
+    "prompt": "Walk me through what a portal does, with an example of when a modal needs to render outside its parent.",
+    "tag": "react-core"
+  },
+  {
+    "term": "error boundary",
+    "prompt": "Explain how an error boundary works in 60 seconds. What kind of errors does it catch, and what does it not catch?",
+    "tag": "react-core"
+  },
+  {
+    "term": "strict mode",
+    "prompt": "Walk me through what strict mode does in development. Why might it make an effect run twice on mount?",
+    "tag": "react-core"
+  },
+  {
+    "term": "useState",
+    "prompt": "Explain what `useState` does in 60 seconds, with an example of when you reach for it.",
+    "tag": "hooks"
+  },
+  {
+    "term": "useEffect",
+    "prompt": "Walk me through what `useEffect` is for and how cleanup works, with an example like fetching data.",
+    "tag": "hooks"
+  },
+  {
+    "term": "useReducer",
+    "prompt": "Compare `useReducer` and `useState`. When would you switch to `useReducer`?",
+    "tag": "hooks"
+  },
+  {
+    "term": "useContext",
+    "prompt": "Explain how `useContext` works in 60 seconds. How does it help with prop drilling?",
+    "tag": "hooks"
+  },
+  {
+    "term": "useRef",
+    "prompt": "Describe what `useRef` is for in 60 seconds. Why doesn't updating a ref cause a re-render?",
+    "tag": "hooks"
+  },
+  {
+    "term": "useMemo",
+    "prompt": "Explain `useMemo` in 60 seconds. When is it actually worth using?",
+    "tag": "hooks"
+  },
+  {
+    "term": "useCallback",
+    "prompt": "Walk me through what `useCallback` does and a case where it really helps. What's a common way people misuse it?",
+    "tag": "hooks"
+  },
+  {
+    "term": "useId",
+    "prompt": "Explain what `useId` solves in 60 seconds. Why does it matter for server-side rendering?",
+    "tag": "hooks"
+  },
+  {
+    "term": "useLayoutEffect",
+    "prompt": "Compare `useLayoutEffect` and `useEffect`. When would you reach for `useLayoutEffect`?",
+    "tag": "hooks"
+  },
+  {
+    "term": "useTransition",
+    "prompt": "Walk me through what `useTransition` does, with an example of when it keeps the UI responsive.",
+    "tag": "hooks"
+  },
+  {
+    "term": "useDeferredValue",
+    "prompt": "Describe `useDeferredValue` in 60 seconds, with an example of the expensive work it helps you delay.",
+    "tag": "hooks"
+  },
+  {
+    "term": "custom hook",
+    "prompt": "Walk me through how you would write a custom hook, with an example of logic you'd want to share.",
+    "tag": "hooks"
+  },
+  {
+    "term": "rules of hooks",
+    "prompt": "Explain the rules of hooks in 60 seconds. Why can't you call a hook inside an `if`?",
+    "tag": "hooks"
+  },
+  {
+    "term": "dependency array",
+    "prompt": "Explain what the dependency array does in a hook like `useEffect` in 60 seconds. What bug happens if you get it wrong?",
+    "tag": "hooks"
+  },
+  {
+    "term": "reconciliation",
+    "prompt": "Walk me through how React's reconciliation works, and explain why bad `key` values can hurt it.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "virtual DOM",
+    "prompt": "Explain what the virtual DOM is in 60 seconds, and why React uses it instead of touching the real DOM directly.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "re-render",
+    "prompt": "Describe what causes a component to re-render, and explain why a parent re-rendering can be a performance problem.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "batching",
+    "prompt": "Explain what state batching is in 60 seconds, and what changed about it in React 18.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "React.memo",
+    "prompt": "Explain what `React.memo` does and when it is actually worth using it.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "unnecessary render",
+    "prompt": "Walk me through how you would spot an unnecessary render, with an example of what commonly causes one.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "fiber",
+    "prompt": "Explain what fiber is in React in 60 seconds, and what it lets React do that the old approach could not.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "commit phase",
+    "prompt": "Describe what happens in the commit phase, and how it differs from the render phase.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "render phase",
+    "prompt": "Explain why the render phase must be pure, with an example of something you should never do there.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "concurrent rendering",
+    "prompt": "Walk me through what concurrent rendering gives you in React 18, with an example of when it helps the user.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "React Profiler",
+    "prompt": "Walk me through how you would use the React Profiler to debug a slow page, and what you look for in its output.",
+    "tag": "react-perf"
+  },
+  {
+    "term": "lifting state up",
+    "prompt": "Explain lifting state up in 60 seconds, with an example of two sibling components that needed to share the same state.",
+    "tag": "state"
+  },
+  {
+    "term": "prop drilling",
+    "prompt": "Walk me through what prop drilling is and how you would avoid it when a value has to reach a deep child.",
+    "tag": "state"
+  },
+  {
+    "term": "global state",
+    "prompt": "Describe global state in 60 seconds. Give an example of something that belongs there instead of in one component.",
+    "tag": "state"
+  },
+  {
+    "term": "local state",
+    "prompt": "Compare local and global state. How do you decide which one to use for a given piece of data?",
+    "tag": "state"
+  },
+  {
+    "term": "derived state",
+    "prompt": "Explain derived state in 60 seconds. Why is it usually a mistake to store it in `useState`?",
+    "tag": "state"
+  },
+  {
+    "term": "single source of truth",
+    "prompt": "Walk me through what single source of truth means and why duplicating the same data in two places causes bugs.",
+    "tag": "state"
+  },
+  {
+    "term": "immutable update",
+    "prompt": "Explain why React needs an immutable update to re-render, with an example using the spread operator on an array.",
+    "tag": "state"
+  },
+  {
+    "term": "optimistic update",
+    "prompt": "Describe an optimistic update in 60 seconds. What is the tradeoff, and how do you handle a failed request?",
+    "tag": "state"
+  },
+  {
+    "term": "selector",
+    "prompt": "Walk me through what a selector does in a store like Redux or Zustand, and why you would use one instead of reading the whole store.",
+    "tag": "state"
+  },
+  {
+    "term": "state library",
+    "prompt": "Compare two state libraries you have used, like Redux and Zustand. How would you decide which one to pick for a project?",
+    "tag": "state"
+  },
+  {
+    "term": "cleanup function",
+    "prompt": "Explain what a cleanup function in `useEffect` does, and give an example of how it helps you avoid a memory leak.",
+    "tag": "effects"
+  },
+  {
+    "term": "stale closure",
+    "prompt": "Walk me through what a stale closure is, using something like a `setInterval` that keeps logging the initial value as your example.",
+    "tag": "effects"
+  },
+  {
+    "term": "race condition in effect",
+    "prompt": "Describe a race condition when you fetch data in an effect, and explain how you would fix it so the wrong result doesn't win.",
+    "tag": "effects"
+  },
+  {
+    "term": "effect dependency bug",
+    "prompt": "Explain in 60 seconds what goes wrong when you leave a value out of a `useEffect` dependency array, and why ESLint warns you about it.",
+    "tag": "effects"
+  },
+  {
+    "term": "data fetching",
+    "prompt": "Compare fetching data inside `useEffect` versus using a data library, and explain when you'd reach for the library.",
+    "tag": "effects"
+  },
+  {
+    "term": "cache invalidation",
+    "prompt": "Explain cache invalidation in 60 seconds, with an example of when you'd invalidate a cache after a user action.",
+    "tag": "effects"
+  },
+  {
+    "term": "data library",
+    "prompt": "Walk me through why you'd use a data library like React Query or `SWR` instead of writing your own loading and error code, and what you get for free.",
+    "tag": "effects"
+  },
+  {
+    "term": "server component",
+    "prompt": "Explain what a server component is in 60 seconds, and give an example of when moving work into one helps the browser.",
+    "tag": "effects"
+  },
+  {
+    "term": "client component",
+    "prompt": "Compare a client component and a server component, and explain when you'd add `\"use client\"` to make something a client component.",
+    "tag": "effects"
+  },
+  {
+    "term": "Suspense",
+    "prompt": "Walk me through how `Suspense` works, with an example of wrapping a slow child in a fallback while it loads.",
+    "tag": "effects"
+  },
+  {
+    "term": "streaming render",
+    "prompt": "Explain streaming render in 60 seconds, and explain why it matters for how fast a user sees the page.",
+    "tag": "effects"
+  },
+  {
+    "term": "lazy loading",
+    "prompt": "Describe lazy loading in 60 seconds, with an example of how it keeps your first page load small.",
+    "tag": "effects"
+  },
+  {
+    "term": "synthetic event",
+    "prompt": "Explain what a synthetic event is in React in 60 seconds, and give an example of when you would call `e.preventDefault()` on one.",
+    "tag": "forms"
+  },
+  {
+    "term": "controlled component",
+    "prompt": "Compare a controlled and an uncontrolled component in 60 seconds. When would you reach for a controlled one?",
+    "tag": "forms"
+  },
+  {
+    "term": "uncontrolled component",
+    "prompt": "Walk me through how an uncontrolled component works and how you read its value with a `ref`, with an example.",
+    "tag": "forms"
+  },
+  {
+    "term": "form library",
+    "prompt": "Describe when you would bring in a form library like `react-hook-form` instead of writing your own form state. What's the tradeoff?",
+    "tag": "forms"
+  },
+  {
+    "term": "event bubbling",
+    "prompt": "Walk me through what event bubbling is in 60 seconds, and explain when you would use `e.stopPropagation()`.",
+    "tag": "forms"
+  },
+  {
+    "term": "event delegation",
+    "prompt": "Explain event delegation and why it matters for how React attaches event listeners, with an example.",
+    "tag": "forms"
+  },
+  {
+    "term": "HTTP method",
+    "prompt": "Walk me through the main HTTP methods like `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`, and give an example of when you would reach for `PATCH` over `PUT`.",
+    "tag": "http"
+  },
+  {
+    "term": "status code",
+    "prompt": "Compare a few status codes you use often, like `200`, `404`, and `409`. When would you return a `409`?",
+    "tag": "http"
+  },
+  {
+    "term": "idempotent",
+    "prompt": "Explain what it means for an endpoint to be idempotent in 60 seconds, and why it matters when a client retries a request.",
+    "tag": "http"
+  },
+  {
+    "term": "REST",
+    "prompt": "Explain what REST means in 60 seconds, with an example of how a URL and an HTTP method work together.",
+    "tag": "http"
+  },
+  {
+    "term": "resource",
+    "prompt": "Describe what a resource is in a REST API, with an example of how you would model something like an `order` as a URL.",
+    "tag": "http"
+  },
+  {
+    "term": "endpoint",
+    "prompt": "Walk me through what makes up an endpoint, using one you have built as an example.",
+    "tag": "http"
+  },
+  {
+    "term": "route",
+    "prompt": "Explain how a route maps a URL pattern to a handler in your server code, with an example like `/users/:id`.",
+    "tag": "http"
+  },
+  {
+    "term": "query parameter",
+    "prompt": "Describe how you use query parameters for things like filtering or paging, with an example such as `?page=2&limit=20`.",
+    "tag": "http"
+  },
+  {
+    "term": "request body",
+    "prompt": "Walk me through when data should go in the request body instead of the URL, with an example from a `POST` or `PATCH` you have written.",
+    "tag": "http"
+  },
+  {
+    "term": "response headers",
+    "prompt": "Explain what response headers are for, with an example like `Cache-Control` and why it matters.",
+    "tag": "http"
+  },
+  {
+    "term": "content type",
+    "prompt": "Explain the `Content-Type` header in 60 seconds, and what can go wrong if it does not match the body.",
+    "tag": "http"
+  },
+  {
+    "term": "CORS",
+    "prompt": "Walk me through a CORS error you have hit, what caused it, and how you fixed it on the server side.",
+    "tag": "http"
+  },
+  {
+    "term": "authentication",
+    "prompt": "Walk me through how you would authenticate a user, in 60 seconds, from login to issuing a token.",
+    "tag": "auth"
+  },
+  {
+    "term": "authorization",
+    "prompt": "Compare authentication and authorization. Give one concrete example of each in a system you have built.",
+    "tag": "auth"
+  },
+  {
+    "term": "JWT",
+    "prompt": "Explain how a `JWT` works in 60 seconds, including how the server trusts a token it did not store.",
+    "tag": "auth"
+  },
+  {
+    "term": "OAuth",
+    "prompt": "Walk me through the `OAuth` flow when a user logs in with Google. Why does the app never see the user's password?",
+    "tag": "auth"
+  },
+  {
+    "term": "session",
+    "prompt": "Compare server-side sessions and `JWT` for tracking a logged-in user. When would you pick a session, and what's the tradeoff?",
+    "tag": "auth"
+  },
+  {
+    "term": "cookie",
+    "prompt": "Describe how you would set a session cookie securely, and explain why you would mark it `HttpOnly`.",
+    "tag": "auth"
+  },
+  {
+    "term": "CSRF",
+    "prompt": "Explain what a CSRF attack is in 60 seconds, with an example of how you would block it.",
+    "tag": "auth"
+  },
+  {
+    "term": "refresh token",
+    "prompt": "Walk me through how you handle token expiry using a short-lived access token and a long-lived refresh token. Why split them?",
+    "tag": "auth"
+  },
+  {
+    "term": "bearer token",
+    "prompt": "Explain what a bearer token is and how it travels in the `Authorization` header. What's the risk if one leaks?",
+    "tag": "auth"
+  },
+  {
+    "term": "scope",
+    "prompt": "Describe what a token scope like `read:user` does, with an example of how it limits what a request can do.",
+    "tag": "auth"
+  },
+  {
+    "term": "API contract",
+    "prompt": "Explain what an API contract is in 60 seconds, with an example of a change that would break it.",
+    "tag": "api-design"
+  },
+  {
+    "term": "versioning",
+    "prompt": "Walk me through how you would ship a breaking change to an API without breaking old clients.",
+    "tag": "api-design"
+  },
+  {
+    "term": "pagination",
+    "prompt": "Describe how you would paginate an endpoint that returns a long list, and why you would not just return everything at once.",
+    "tag": "api-design"
+  },
+  {
+    "term": "cursor pagination",
+    "prompt": "Compare cursor pagination and offset pagination. When would you pick a cursor?",
+    "tag": "api-design"
+  },
+  {
+    "term": "rate limiting",
+    "prompt": "Explain rate limiting in 60 seconds. Why does it matter for stopping abuse?",
+    "tag": "api-design"
+  },
+  {
+    "term": "throttling",
+    "prompt": "Walk me through the difference between throttling a client and blocking it. When would you slow a client down instead of returning an error?",
+    "tag": "api-design"
+  },
+  {
+    "term": "retry",
+    "prompt": "Describe how you decide which failed requests to retry. Why retry a network error but not a `400`?",
+    "tag": "api-design"
+  },
+  {
+    "term": "exponential backoff",
+    "prompt": "Explain exponential backoff in 60 seconds. Why do you add jitter?",
+    "tag": "api-design"
+  },
+  {
+    "term": "idempotency key",
+    "prompt": "Walk me through what an idempotency key does, with an example of why a payment API needs one.",
+    "tag": "api-design"
+  },
+  {
+    "term": "webhook",
+    "prompt": "Explain what a webhook is in 60 seconds, and when you would use one instead of having the client ask for updates.",
+    "tag": "api-design"
+  },
+  {
+    "term": "polling",
+    "prompt": "Compare polling and WebSockets for getting new data. What is the tradeoff?",
+    "tag": "api-design"
+  },
+  {
+    "term": "long polling",
+    "prompt": "Describe how long polling works, and when you would reach for it over plain polling.",
+    "tag": "api-design"
+  },
+  {
+    "term": "database",
+    "prompt": "Walk me through how you would describe the role of a database in your backend, in 60 seconds, using one project as an example.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "SQL vs NoSQL",
+    "prompt": "Compare SQL and NoSQL. For your last project, which did you pick and why?",
+    "tag": "data-layer"
+  },
+  {
+    "term": "ORM",
+    "prompt": "Explain what an ORM like `Prisma` gives you in 60 seconds. What is one tradeoff, and when would you drop to raw SQL?",
+    "tag": "data-layer"
+  },
+  {
+    "term": "migration",
+    "prompt": "Walk me through how you ship a schema change with a migration, using one you actually wrote as an example.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "index",
+    "prompt": "Explain what a database index does in 60 seconds, with an example of a slow query you fixed by adding one.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "transaction",
+    "prompt": "Describe what a transaction is in 60 seconds, with an example of when you needed all the operations to succeed or roll back together.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "ACID",
+    "prompt": "Explain `ACID` in 60 seconds. Why do those four guarantees matter for something like a bank transfer?",
+    "tag": "data-layer"
+  },
+  {
+    "term": "query",
+    "prompt": "Walk me through how you would speed up a slow query, with an example of a real one you made faster.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "join",
+    "prompt": "Explain what a SQL `JOIN` does in 60 seconds, with an example of two tables you combined and which join type you used.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "schema",
+    "prompt": "Describe what you mean by a database schema in 60 seconds, using the tables from one project as an example.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "primary key",
+    "prompt": "Explain what a primary key is and why each row needs one. When would you pick a `UUID` over an auto-increment integer?",
+    "tag": "data-layer"
+  },
+  {
+    "term": "foreign key",
+    "prompt": "Walk me through how a foreign key links two tables, with an example like `order.user_id` referencing `user.id`.",
+    "tag": "data-layer"
+  },
+  {
+    "term": "TCP / UDP",
+    "prompt": "Compare `TCP` and `UDP` in 60 seconds. Give an example of when you would pick `UDP` over `TCP`.",
+    "tag": "networking"
+  },
+  {
+    "term": "WebSocket",
+    "prompt": "Walk me through when you would reach for a `WebSocket` instead of normal HTTP requests, and what it buys you.",
+    "tag": "networking"
+  },
+  {
+    "term": "SSE",
+    "prompt": "Explain how Server-Sent Events work in 60 seconds. When would you use `SSE` instead of a `WebSocket`?",
+    "tag": "networking"
+  },
+  {
+    "term": "gRPC",
+    "prompt": "Describe what `gRPC` gives you over a REST API, and what the tradeoff is.",
+    "tag": "networking"
+  },
+  {
+    "term": "GraphQL",
+    "prompt": "Compare REST and `GraphQL` in 60 seconds. When would `GraphQL` be the better choice?",
+    "tag": "networking"
+  },
+  {
+    "term": "HTTPS / TLS",
+    "prompt": "Walk me through what `TLS` actually protects in an HTTPS request, in 60 seconds.",
+    "tag": "networking"
+  },
+  {
+    "term": "DNS",
+    "prompt": "Explain how `DNS` turns a name like `api.example.com` into an IP address. Why does the TTL matter?",
+    "tag": "networking"
+  },
+  {
+    "term": "latency",
+    "prompt": "Explain what latency is in 60 seconds, with an example of how you reduced it in a real system.",
+    "tag": "networking"
+  },
+  {
+    "term": "request/response cycle",
+    "prompt": "Walk me through the full request/response cycle of a single HTTP call, and where you would look first when it is slow.",
+    "tag": "networking"
+  },
+  {
+    "term": "payload",
+    "prompt": "Describe what a request or response payload is, and how you would shrink one that is too big.",
+    "tag": "networking"
+  },
+  {
+    "term": "logging",
+    "prompt": "Walk me through how you debug an issue in production using logs, and explain what makes logging actually useful when something breaks.",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "monitoring",
+    "prompt": "Explain what you would monitor on a backend service in 60 seconds, and which metric would tell you first that something is wrong.",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "observability",
+    "prompt": "Compare monitoring and observability in 60 seconds. When do you need traces, not just metrics?",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "error tracking",
+    "prompt": "Describe how a tool like `Sentry` helps you in production, and why grouping exceptions matters more than just logging them.",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "health check",
+    "prompt": "Explain what a health check endpoint does in 60 seconds, and how a load balancer uses it to keep traffic away from a bad host.",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "graceful shutdown",
+    "prompt": "Walk me through what happens on `SIGTERM` when a server shuts down gracefully, and why it matters during a deploy.",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "connection pool",
+    "prompt": "Explain what a database connection pool is in 60 seconds. If the DB is slow under load, how would pool size relate to that?",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "timeout",
+    "prompt": "Explain why you would set a timeout on a downstream call in 60 seconds, and what goes wrong if you pick a value that is too high or too low.",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "circuit breaker",
+    "prompt": "Walk me through how a circuit breaker works in 60 seconds, with an example of when it would protect your service.",
+    "tag": "backend-prod"
+  },
+  {
+    "term": "monolith",
+    "prompt": "Walk me through when you would start a project as a monolith instead of microservices, and what signal tells you it is time to split out a service.",
+    "tag": "architecture"
+  },
+  {
+    "term": "microservices",
+    "prompt": "Explain the main tradeoff of microservices in 60 seconds. What do you give up compared to a monolith?",
+    "tag": "architecture"
+  },
+  {
+    "term": "serverless",
+    "prompt": "Describe when you would pick serverless for a workload, with a concrete example of traffic that fits it well.",
+    "tag": "architecture"
+  },
+  {
+    "term": "edge computing",
+    "prompt": "Explain in 60 seconds how running code at the edge helps latency, and what kind of work you would NOT push to the edge.",
+    "tag": "architecture"
+  },
+  {
+    "term": "BFF",
+    "prompt": "Walk me through why you would put a `BFF` in front of a mobile app instead of letting it call the services directly.",
+    "tag": "architecture"
+  },
+  {
+    "term": "API gateway",
+    "prompt": "Explain what an API gateway does in front of your services, in 60 seconds. Why move auth and rate-limiting there?",
+    "tag": "architecture"
+  },
+  {
+    "term": "service mesh",
+    "prompt": "Compare a service mesh with an API gateway. What problem does the mesh solve that the gateway does not?",
+    "tag": "architecture"
+  },
+  {
+    "term": "event-driven architecture",
+    "prompt": "Walk me through how you would use an event-driven approach to decouple two services, with an example of an event you would publish.",
+    "tag": "architecture"
+  },
+  {
+    "term": "CQRS",
+    "prompt": "Explain `CQRS` in 60 seconds. When is splitting the read path and write path worth the extra complexity?",
+    "tag": "architecture"
+  },
+  {
+    "term": "hexagonal architecture",
+    "prompt": "Describe hexagonal architecture in 60 seconds, with an example of something it makes easier to swap or test.",
+    "tag": "architecture"
+  },
+  {
+    "term": "cache",
+    "prompt": "Walk me through how you would add a cache to speed up a slow product page, in 60 seconds. What would you cache and why?",
+    "tag": "caching"
+  },
+  {
+    "term": "cache hit / miss",
+    "prompt": "Explain cache hit and miss in 60 seconds. If your hit rate suddenly dropped from 90% to 60%, how would you start debugging it?",
+    "tag": "caching"
+  },
+  {
+    "term": "TTL",
+    "prompt": "Explain what `TTL` does for a cached value in 60 seconds. How do you pick a good `TTL`, and what's the tradeoff?",
+    "tag": "caching"
+  },
+  {
+    "term": "cache invalidation",
+    "prompt": "Walk me through cache invalidation in 60 seconds, with an example of when you had to do it after a write.",
+    "tag": "caching"
+  },
+  {
+    "term": "CDN",
+    "prompt": "Describe what a `CDN` does and when you would put something behind one, in 60 seconds. Why does it help users in different regions?",
+    "tag": "caching"
+  },
+  {
+    "term": "in-memory cache",
+    "prompt": "Explain what an in-memory cache like Redis is good for, in 60 seconds. What kind of data would you put in it, and what would you not?",
+    "tag": "caching"
+  },
+  {
+    "term": "write-through cache",
+    "prompt": "Walk me through how a write-through cache works in 60 seconds. What's the tradeoff you accept by writing to both the cache and the database?",
+    "tag": "caching"
+  },
+  {
+    "term": "write-behind cache",
+    "prompt": "Compare a write-behind cache to a write-through cache in 60 seconds. When is write-behind worth the risk of losing writes?",
+    "tag": "caching"
+  },
+  {
+    "term": "stale-while-revalidate",
+    "prompt": "Explain stale-while-revalidate in 60 seconds, with an example of when serving slightly stale data is a good trade.",
+    "tag": "caching"
+  },
+  {
+    "term": "cache stampede",
+    "prompt": "Walk me through what a cache stampede is and why it happens when a popular key expires. How would you prevent it?",
+    "tag": "caching"
+  },
+  {
+    "term": "replication",
+    "prompt": "Explain database replication in 60 seconds. How does it help you scale reads?",
+    "tag": "databases"
+  },
+  {
+    "term": "sharding",
+    "prompt": "Walk me through how you would shard a database, with an example of a good shard key and why you picked it.",
+    "tag": "databases"
+  },
+  {
+    "term": "read replica",
+    "prompt": "Describe what a read replica is and give an example of a query you would send to one instead of the primary.",
+    "tag": "databases"
+  },
+  {
+    "term": "primary / replica",
+    "prompt": "Walk me through what happens in a `primary / replica` setup when the primary fails. How does failover work?",
+    "tag": "databases"
+  },
+  {
+    "term": "eventual consistency",
+    "prompt": "Explain eventual consistency in 60 seconds, with an example of where stale reads are fine and where they are not.",
+    "tag": "databases"
+  },
+  {
+    "term": "strong consistency",
+    "prompt": "Compare strong consistency with eventual consistency. When is strong consistency worth the cost?",
+    "tag": "databases"
+  },
+  {
+    "term": "partition",
+    "prompt": "Explain what a partition is in a distributed system, with an example of how you would choose a partition key.",
+    "tag": "databases"
+  },
+  {
+    "term": "denormalization",
+    "prompt": "Walk me through denormalization in 60 seconds. What is the tradeoff you are making?",
+    "tag": "databases"
+  },
+  {
+    "term": "hot key",
+    "prompt": "Describe what a hot key is and walk me through how you would fix one that is overloading a single shard.",
+    "tag": "databases"
+  },
+  {
+    "term": "materialized view",
+    "prompt": "Explain what a materialized view is and when you would use one instead of a normal query.",
+    "tag": "databases"
+  },
+  {
+    "term": "message queue",
+    "prompt": "Explain what a message queue gives you between a producer and a consumer, in 60 seconds. What problem does it solve?",
+    "tag": "queues"
+  },
+  {
+    "term": "pub/sub",
+    "prompt": "Walk me through how pub/sub works, with a concrete example of one event and the services that subscribe to it.",
+    "tag": "queues"
+  },
+  {
+    "term": "event bus",
+    "prompt": "Describe what an event bus is and why a team might put one between many services. What's the tradeoff of sharing it?",
+    "tag": "queues"
+  },
+  {
+    "term": "dead letter queue",
+    "prompt": "Explain what a dead letter queue is for, in 60 seconds. Why not just retry the bad message forever?",
+    "tag": "queues"
+  },
+  {
+    "term": "idempotent consumer",
+    "prompt": "Walk me through how you would make a consumer idempotent, with an example of what you check before processing.",
+    "tag": "queues"
+  },
+  {
+    "term": "at-least-once delivery",
+    "prompt": "Explain at-least-once delivery in 60 seconds. What does it force you to do on the consumer side?",
+    "tag": "queues"
+  },
+  {
+    "term": "exactly-once delivery",
+    "prompt": "Compare exactly-once delivery with at-least-once plus idempotency. Which would you reach for, and why?",
+    "tag": "queues"
+  },
+  {
+    "term": "ordering guarantee",
+    "prompt": "Walk me through ordering guarantees in a queue like `Kafka`, in 60 seconds. Where does ordering hold and where does it break?",
+    "tag": "queues"
+  },
+  {
+    "term": "fan-out",
+    "prompt": "Describe what fan-out means in a system like a social feed, with an example. What's the tradeoff of doing it on write?",
+    "tag": "queues"
+  },
+  {
+    "term": "back-pressure",
+    "prompt": "Explain back-pressure in 60 seconds. What happens to a system that has no back-pressure when a consumer gets slow?",
+    "tag": "queues"
+  },
+  {
+    "term": "fault tolerance",
+    "prompt": "Explain fault tolerance in 60 seconds, with an example of one design choice you would make so the system keeps working when a part fails.",
+    "tag": "reliability"
+  },
+  {
+    "term": "redundancy",
+    "prompt": "Walk me through what redundancy means in a system design, and what the tradeoff is for running extra copies.",
+    "tag": "reliability"
+  },
+  {
+    "term": "failover",
+    "prompt": "Describe how failover works in 60 seconds. What has to be in place before it can switch over automatically?",
+    "tag": "reliability"
+  },
+  {
+    "term": "blast radius",
+    "prompt": "Explain blast radius in 60 seconds, with one concrete example of how you would limit it.",
+    "tag": "reliability"
+  },
+  {
+    "term": "SLA / SLO / SLI",
+    "prompt": "Compare `SLA`, `SLO`, and `SLI`. When would you set an `SLO` tighter than the `SLA` you promised users?",
+    "tag": "reliability"
+  },
+  {
+    "term": "graceful degradation",
+    "prompt": "Walk me through graceful degradation with a real example of a feature you would drop so the page still loads when a dependency fails.",
+    "tag": "reliability"
+  },
+  {
+    "term": "retry storm",
+    "prompt": "Explain what a retry storm is in 60 seconds, and one thing you would add to retries to prevent it.",
+    "tag": "reliability"
+  },
+  {
+    "term": "bulkhead pattern",
+    "prompt": "Describe the bulkhead pattern in 60 seconds, with an example of how you would isolate one part so it cannot drag down the rest.",
+    "tag": "reliability"
+  },
+  {
+    "term": "chaos engineering",
+    "prompt": "Walk me through how chaos engineering works, and why a team would deliberately break things in production.",
+    "tag": "reliability"
+  },
+  {
+    "term": "canary deployment",
+    "prompt": "Explain a canary deployment in 60 seconds. What do you watch before you ramp to 100% traffic?",
+    "tag": "reliability"
+  },
+  {
+    "term": "horizontal scaling",
+    "prompt": "An interviewer asks how you would scale this service. Explain horizontal scaling in 60 seconds and when you would reach for it over a bigger machine.",
+    "tag": "scaling"
+  },
+  {
+    "term": "vertical scaling",
+    "prompt": "Compare vertical scaling with horizontal scaling. When would you choose to make one machine bigger, and what is the tradeoff?",
+    "tag": "scaling"
+  },
+  {
+    "term": "load balancer",
+    "prompt": "Walk me through what a load balancer does in a system, and explain one way it can decide which backend gets each request.",
+    "tag": "scaling"
+  },
+  {
+    "term": "autoscaling",
+    "prompt": "Describe how autoscaling works in 60 seconds, with an example of a metric you would scale on and why.",
+    "tag": "scaling"
+  },
+  {
+    "term": "throughput",
+    "prompt": "Explain throughput in 60 seconds, and give one concrete change you have made that raised the requests per second a system could handle.",
+    "tag": "scaling"
+  },
+  {
+    "term": "latency budget",
+    "prompt": "An interviewer asks how you would hit a 100ms target. Walk me through how you would split a latency budget across the steps in the request.",
+    "tag": "scaling"
+  },
+  {
+    "term": "p50 / p99",
+    "prompt": "Explain the difference between `p50` and `p99` latency in 60 seconds, and why the tail matters more than the average.",
+    "tag": "scaling"
+  },
+  {
+    "term": "cold start",
+    "prompt": "Explain what a cold start is in 60 seconds, with an example of when it hurts users and one way to reduce it.",
+    "tag": "scaling"
+  },
+  {
+    "term": "warm pool",
+    "prompt": "Describe what a warm pool is and why you would keep one. What is the tradeoff of running idle instances?",
+    "tag": "scaling"
+  },
+  {
+    "term": "edge cache",
+    "prompt": "Walk me through how an edge cache speeds up a page, and give an example of what you would and would not cache there.",
+    "tag": "scaling"
+  },
+  {
+    "term": "request coalescing",
+    "prompt": "Explain request coalescing in 60 seconds, and describe the cache problem it is meant to prevent.",
+    "tag": "scaling"
+  },
+  {
+    "term": "compression",
+    "prompt": "Explain why response compression like `gzip` or `brotli` helps performance, with an example of when it is worth the CPU cost.",
+    "tag": "scaling"
+  },
+  {
+    "term": "batching",
+    "prompt": "Walk me through how batching cuts overhead, with an example where grouping many small calls into one made a real difference.",
+    "tag": "scaling"
+  },
+  {
+    "term": "prefetching",
+    "prompt": "Describe how prefetching improves the user experience, and explain the tradeoff if you prefetch too aggressively.",
+    "tag": "scaling"
+  },
+  {
+    "term": "read amplification",
+    "prompt": "Explain read amplification in 60 seconds, with an example like an N+1 query and how you would fix it.",
+    "tag": "scaling"
+  },
+  {
+    "term": "token",
+    "prompt": "Explain what a `token` is in 60 seconds, and why it matters for cost and latency.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "tokenization",
+    "prompt": "Walk me through what `tokenization` does, and why the same text can cost more tokens in one model than another.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "context window",
+    "prompt": "Describe what a `context window` is and the tradeoff you weigh when you decide how much to put into it.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "temperature",
+    "prompt": "Explain how `temperature` shapes a model's output, with an example of when you set it high versus near 0.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "top_p",
+    "prompt": "Compare `top_p` and `temperature` for controlling randomness. When would you reach for `top_p`?",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "max_tokens",
+    "prompt": "Walk me through what `max_tokens` controls, and how you use it for cost control.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "stop sequence",
+    "prompt": "Explain what a `stop sequence` is in 60 seconds, with an example of when you would set one.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "system prompt",
+    "prompt": "Describe what a `system prompt` is and why it matters for how the model behaves.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "completion",
+    "prompt": "Explain what a `completion` is in an LLM call, and why you would log it alongside the prompt.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "streaming response",
+    "prompt": "Walk me through how a `streaming response` works, and why it helps the user experience even when total time is the same.",
+    "tag": "llm-basics"
+  },
+  {
+    "term": "prompt engineering",
+    "prompt": "Explain what prompt engineering is in 60 seconds, with an example of a prompt change you made that fixed a real problem.",
+    "tag": "prompting"
+  },
+  {
+    "term": "few-shot",
+    "prompt": "Walk me through how few-shot prompting works, and when adding examples is worth it versus just writing clearer instructions.",
+    "tag": "prompting"
+  },
+  {
+    "term": "zero-shot",
+    "prompt": "Compare zero-shot and few-shot prompting. When would you reach for zero-shot first?",
+    "tag": "prompting"
+  },
+  {
+    "term": "chain-of-thought",
+    "prompt": "Explain chain-of-thought prompting in 60 seconds. For what kind of task does it actually help?",
+    "tag": "prompting"
+  },
+  {
+    "term": "structured output",
+    "prompt": "Describe what structured output means and why it matters when an LLM reply feeds into the rest of your code.",
+    "tag": "prompting"
+  },
+  {
+    "term": "JSON mode",
+    "prompt": "Compare `JSON mode` to just asking the model for JSON in the prompt. What does `JSON mode` give you that a plain instruction does not?",
+    "tag": "prompting"
+  },
+  {
+    "term": "role",
+    "prompt": "Walk me through the `system`, `user`, and `assistant` roles in a chat API, and what you put in each one.",
+    "tag": "prompting"
+  },
+  {
+    "term": "prompt template",
+    "prompt": "Explain what a prompt template is in 60 seconds, with an example of placeholders like `{topic}` you would fill in at runtime.",
+    "tag": "prompting"
+  },
+  {
+    "term": "instruction tuning",
+    "prompt": "Explain instruction tuning in 60 seconds. Why do most apps use an instruction-tuned model instead of the raw base model?",
+    "tag": "prompting"
+  },
+  {
+    "term": "context stuffing",
+    "prompt": "Compare context stuffing with RAG. When would you just stuff the docs into a long context window, and what's the tradeoff?",
+    "tag": "prompting"
+  },
+  {
+    "term": "prompt caching",
+    "prompt": "Explain prompt caching in 60 seconds. How does reusing a stable prompt prefix cut cost and latency?",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "cache hit rate",
+    "prompt": "Walk me through what cache hit rate means and one thing you would change in a prompt to raise it.",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "cost per token",
+    "prompt": "Explain cost per token in 60 seconds, and why input and output tokens are usually priced differently.",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "input / output pricing",
+    "prompt": "Describe how input and output pricing differ, and one thing you would do in your prompt design to save money because of it.",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "model size tradeoff",
+    "prompt": "Walk me through the tradeoff between a big model and a small model. When would you pick the smaller one?",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "cheap-vs-smart routing",
+    "prompt": "Explain cheap-vs-smart routing in 60 seconds, with an example of how you decide which model gets a request.",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "token budget",
+    "prompt": "Describe what a token budget is and why it matters when you are designing an agent.",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "parallel calls",
+    "prompt": "Walk me through when you would run LLM calls in parallel instead of one after another, and what you gain from it.",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "request batching",
+    "prompt": "Compare a normal API call with request batching. When is the slower, cheaper batch worth it?",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "latency vs cost",
+    "prompt": "Explain the latency vs cost tradeoff in 60 seconds, with an example of a feature where you chose speed over price.",
+    "tag": "llm-cost"
+  },
+  {
+    "term": "hallucination",
+    "prompt": "Walk me through how you handle hallucinations in an LLM feature, with one concrete technique you have actually used.",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "refusal",
+    "prompt": "Explain the tradeoff between too many refusals and too few in a production model. Why does over-refusal hurt the user experience?",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "guardrail",
+    "prompt": "Describe what a guardrail is and where you put it around the model, with an example of something it should block.",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "content filter",
+    "prompt": "Compare a content filter that runs on the input versus one that runs on the output. When would you need both?",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "jailbreak",
+    "prompt": "Explain what a jailbreak is in 60 seconds, and why it is hard to fully prevent.",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "prompt injection",
+    "prompt": "Walk me through a prompt injection attack on an agent, with an example and how you would defend against it.",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "output validation",
+    "prompt": "Describe how you validate a model's reply before using it, using a case where it returns `JSON`. What do you do when validation fails?",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "fallback model",
+    "prompt": "Explain when and why you would use a fallback model, with an example of what triggers the switch.",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "safety classifier",
+    "prompt": "Walk me through how a safety classifier fits into your architecture in 60 seconds. What is the tradeoff of adding one?",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "PII filtering",
+    "prompt": "Describe how you do PII filtering on prompts or logs, and why it matters for privacy and compliance.",
+    "tag": "llm-safety"
+  },
+  {
+    "term": "eval set",
+    "prompt": "Walk me through how you would build an eval set to measure model quality, in about 60 seconds.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "golden dataset",
+    "prompt": "Explain what a golden dataset is and why teams keep it small but hand-checked, in 60 seconds.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "automated eval",
+    "prompt": "Describe how you would use an automated eval to catch regressions, with one example of what it scores.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "human eval",
+    "prompt": "Compare automated eval and human eval. When is human eval worth the cost?",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "regression test",
+    "prompt": "Walk me through how a regression test catches a change that makes a previously-working case worse, in 60 seconds.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "A/B test",
+    "prompt": "Explain how you would run an A/B test to decide which prompt to ship, and what signal you would compare.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "prompt regression",
+    "prompt": "Describe what a prompt regression is, with an example of a change that helps one case but hurts another.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "accuracy vs helpfulness",
+    "prompt": "Compare accuracy and helpfulness when you evaluate a model. Why can an answer score high on one and low on the other?",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "side-by-side comparison",
+    "prompt": "Walk me through why a side-by-side comparison can give clearer signal than absolute scoring, in 60 seconds.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "LLM-as-judge",
+    "prompt": "Explain how `LLM-as-judge` works and what the tradeoff is versus human eval, in about 60 seconds.",
+    "tag": "llm-eval"
+  },
+  {
+    "term": "observability for LLMs",
+    "prompt": "Walk me through how you'd set up observability for an LLM feature, and what you would log to debug a bad output in production.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "time to first token",
+    "prompt": "Explain `TTFT` in 60 seconds, and tell me one thing you would do to bring it down.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "tokens per second",
+    "prompt": "Describe what tokens per second means and why it matters for the user experience, with an example.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "p99 latency",
+    "prompt": "Compare `p50` and `p99` latency. Why do you care about `p99` even when `p50` looks fine?",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "retry with backoff",
+    "prompt": "Explain retry with backoff in 60 seconds, and tell me which status codes you would and would not retry on.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "request cancellation",
+    "prompt": "Walk me through how you handle request cancellation for an in-flight LLM call, and why it matters for cost.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "provider rate limiting",
+    "prompt": "Describe how you deal with provider rate limiting at peak traffic. What's the tradeoff in your approach?",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "cost monitoring",
+    "prompt": "Explain how you'd do cost monitoring for an LLM feature in 60 seconds. How would it catch a runaway agent loop?",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "prompt versioning",
+    "prompt": "Walk me through how you handle prompt versioning, and tell me about a time it would let you roll back quickly.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "model versioning",
+    "prompt": "Explain why you'd pin a model version in production, and what the tradeoff is, in 60 seconds.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "model deprecation",
+    "prompt": "Describe how you'd handle a model deprecation with a sunset deadline. Walk me through your migration plan.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "canary deployment for prompts",
+    "prompt": "Walk me through a canary deployment for a new prompt, and how you decide whether to expand it.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "provider failover",
+    "prompt": "Explain provider failover in 60 seconds, with an example of when it would keep you online.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "usage cap",
+    "prompt": "Describe how you'd add a usage cap per user or tenant, and why it matters for cost and abuse.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "log redaction",
+    "prompt": "Walk me through how you do log redaction on prompt logs, and why it matters for privacy and compliance.",
+    "tag": "llm-prod"
+  },
+  {
+    "term": "agent",
+    "prompt": "Explain what makes an LLM an \"agent\" in 60 seconds, with an example of something an agent does that a single chat reply cannot.",
+    "tag": "agents"
+  },
+  {
+    "term": "agent loop",
+    "prompt": "Walk me through one turn of an agent loop — think, act, observe — in 60 seconds, using a real tool call as your example.",
+    "tag": "agents"
+  },
+  {
+    "term": "autonomy",
+    "prompt": "Compare a high-autonomy agent with one that asks the user before each action. When would you choose lower autonomy, and what's the tradeoff?",
+    "tag": "agents"
+  },
+  {
+    "term": "action",
+    "prompt": "Describe what an \"action\" is in an agent, and give a concrete example of one your agent might take.",
+    "tag": "agents"
+  },
+  {
+    "term": "observation",
+    "prompt": "Explain what an observation is in the agent loop and why the model needs it before deciding its next action. Give an example.",
+    "tag": "agents"
+  },
+  {
+    "term": "plan",
+    "prompt": "Walk me through how an agent makes a plan before it starts acting. When is planning first worth it instead of just reacting step by step?",
+    "tag": "agents"
+  },
+  {
+    "term": "reflection",
+    "prompt": "Explain reflection in an agent in 60 seconds, with an example of a mistake a reflection step could catch.",
+    "tag": "agents"
+  },
+  {
+    "term": "termination condition",
+    "prompt": "Describe how you decide when your agent should stop the loop. Give a concrete termination condition you would use and why.",
+    "tag": "agents"
+  },
+  {
+    "term": "max steps",
+    "prompt": "Walk me through why you would set a max-steps cap on an agent. What's the tradeoff if you set it too low?",
+    "tag": "agents"
+  },
+  {
+    "term": "agent persona",
+    "prompt": "Explain how an agent persona in the system prompt shapes the agent's behavior, with an example of a persona and what it changes.",
+    "tag": "agents"
+  },
+  {
+    "term": "tool",
+    "prompt": "Explain what a tool is in an agent, in 60 seconds, with an example of one you would give to a coding agent.",
+    "tag": "tools"
+  },
+  {
+    "term": "function calling",
+    "prompt": "Walk me through how the model uses tools through function calling. What does the model output instead of free text?",
+    "tag": "tools"
+  },
+  {
+    "term": "tool schema",
+    "prompt": "Describe what goes into a tool schema, and explain why a good description and clear parameter types matter for the model.",
+    "tag": "tools"
+  },
+  {
+    "term": "parameter",
+    "prompt": "Explain how you decide a tool's parameters, in 60 seconds. When would you make one required versus optional with a default?",
+    "tag": "tools"
+  },
+  {
+    "term": "tool selection",
+    "prompt": "Walk me through how the model picks which tool to call next. When tool selection goes wrong, how do you debug it?",
+    "tag": "tools"
+  },
+  {
+    "term": "parallel tool calls",
+    "prompt": "Explain parallel tool calls in 60 seconds. What's the latency benefit, and when can you NOT do them safely?",
+    "tag": "tools"
+  },
+  {
+    "term": "tool error handling",
+    "prompt": "Walk me through how your agent should handle a tool failure. When do you retry versus report versus give up?",
+    "tag": "tools"
+  },
+  {
+    "term": "tool result",
+    "prompt": "Describe what happens to a tool result before it goes back to the model. Why does a huge result matter for the context window?",
+    "tag": "tools"
+  },
+  {
+    "term": "MCP",
+    "prompt": "Explain what `MCP` is in 60 seconds. What problem does it solve compared to writing tools per app?",
+    "tag": "tools"
+  },
+  {
+    "term": "tool registry",
+    "prompt": "Walk me through what a tool registry does in 60 seconds, and explain why you would load tools from one instead of hardcoding them.",
+    "tag": "tools"
+  },
+  {
+    "term": "RAG",
+    "prompt": "Explain how `RAG` lets a model answer from your own docs instead of its training data, in 60 seconds.",
+    "tag": "rag"
+  },
+  {
+    "term": "embedding",
+    "prompt": "Walk me through what an embedding is and how it makes semantic search possible, with a concrete example.",
+    "tag": "rag"
+  },
+  {
+    "term": "vector database",
+    "prompt": "Explain why a RAG system needs a vector database instead of a normal SQL database. What problem does it solve?",
+    "tag": "rag"
+  },
+  {
+    "term": "semantic search",
+    "prompt": "Compare semantic search and keyword search. When would semantic search win, and can you give an example?",
+    "tag": "rag"
+  },
+  {
+    "term": "chunking",
+    "prompt": "Walk me through how you chunk a long document before embedding it, and why the chunk boundaries matter.",
+    "tag": "rag"
+  },
+  {
+    "term": "chunk size",
+    "prompt": "Explain the tradeoff in picking a chunk size for RAG. What goes wrong if chunks are too small or too big?",
+    "tag": "rag"
+  },
+  {
+    "term": "retrieval",
+    "prompt": "Walk me through the retrieval step in a RAG flow, from a user query to the chunks you pass to the model, in 60 seconds.",
+    "tag": "rag"
+  },
+  {
+    "term": "reranking",
+    "prompt": "Describe what a reranker adds to a RAG pipeline and why it can improve answer quality, with an example.",
+    "tag": "rag"
+  },
+  {
+    "term": "hybrid search",
+    "prompt": "Explain what hybrid search combines and when it beats pure semantic search, with a concrete example.",
+    "tag": "rag"
+  },
+  {
+    "term": "top-k",
+    "prompt": "Explain what `top-k` controls in retrieval and the tradeoff when you raise it from 3 to 10.",
+    "tag": "rag"
+  },
+  {
+    "term": "short-term memory",
+    "prompt": "Explain what short-term memory means for an agent in 60 seconds, and how it relates to the context window.",
+    "tag": "memory"
+  },
+  {
+    "term": "long-term memory",
+    "prompt": "Walk me through how an agent keeps long-term memory across sessions, with an example of something worth remembering between conversations.",
+    "tag": "memory"
+  },
+  {
+    "term": "conversation history",
+    "prompt": "Describe how you would send conversation history with each request, and what's the tradeoff if you send too many past turns.",
+    "tag": "memory"
+  },
+  {
+    "term": "summarization",
+    "prompt": "Explain summarization for a long conversation in 60 seconds. When is it worth doing, and what could go wrong?",
+    "tag": "memory"
+  },
+  {
+    "term": "compaction",
+    "prompt": "Walk me through what compaction does for a long-running agent, and how it differs from plain summarization.",
+    "tag": "memory"
+  },
+  {
+    "term": "context window management",
+    "prompt": "Explain context window management in 90 seconds, with an example of how you decide what to keep, drop, or summarize.",
+    "tag": "memory"
+  },
+  {
+    "term": "memory store",
+    "prompt": "Describe what a memory store is and how you would design one, with an example of what a single stored fact looks like.",
+    "tag": "memory"
+  },
+  {
+    "term": "recall",
+    "prompt": "Explain recall in agent memory in 60 seconds. How do you bring back the right memory at the right time?",
+    "tag": "memory"
+  },
+  {
+    "term": "episodic memory",
+    "prompt": "Compare episodic memory to general facts the agent knows, with an example of when episodic memory matters.",
+    "tag": "memory"
+  },
+  {
+    "term": "semantic memory",
+    "prompt": "Explain semantic memory in 60 seconds, with an example of a stable fact you would store about a user.",
+    "tag": "memory"
+  },
+  {
+    "term": "orchestrator",
+    "prompt": "Explain what an orchestrator does in a multi-agent system, in 60 seconds. Give an example of how it decides which agent runs next.",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "sub-agent",
+    "prompt": "Describe when you would spawn a sub-agent inside a bigger agent, and what problem it solves for keeping context clean.",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "hand-off",
+    "prompt": "Walk me through a hand-off between two agents in 60 seconds. What context has to travel along with control?",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "agent-to-agent",
+    "prompt": "Explain agent-to-agent communication in 60 seconds. Give an example of when one agent would message another directly.",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "delegation",
+    "prompt": "Walk me through how delegation works between agents, with an example of why one agent would give a subtask to another instead of doing it itself.",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "supervisor pattern",
+    "prompt": "Describe the supervisor pattern in 60 seconds. Why does it matter for reliability and safety?",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "planner-executor",
+    "prompt": "Compare the planner and executor roles in a planner-executor setup. What is the tradeoff that makes this split worth it?",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "agent graph",
+    "prompt": "Explain what an agent graph is in 60 seconds, with an example of a node and an edge.",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "multi-turn",
+    "prompt": "Walk me through what makes a multi-turn task harder than a single answer, in 60 seconds. Give an example.",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "conversation state",
+    "prompt": "Describe what goes into conversation state and why you would persist it, with an example of what breaks if you lose it.",
+    "tag": "multi-agent"
+  },
+  {
+    "term": "agent trace",
+    "prompt": "Walk me through how you use an agent trace to debug a misbehaving agent, with an example of something you found at a specific step.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "span",
+    "prompt": "Explain what a span is inside a trace in 60 seconds, and how spans relate to the whole trace.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "tool call accuracy",
+    "prompt": "Describe how you measure tool call accuracy for an agent, and why it matters more than just looking at the final answer.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "task completion rate",
+    "prompt": "Explain task completion rate in 60 seconds, with an example of a change that moved the number.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "success rate",
+    "prompt": "Compare success rate to task completion rate for an agent. When would you trust one over the other?",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "hallucination in tools",
+    "prompt": "Walk me through what a hallucinated tool call is and how you would stop it from breaking your agent.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "prompt leak",
+    "prompt": "Describe what a prompt leak is and one thing you would do to prevent the agent from exposing its system prompt.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "prompt regression test",
+    "prompt": "Explain why you would add a prompt regression test in 60 seconds, with an example of a failure it could catch.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "golden tasks",
+    "prompt": "Walk me through how you would pick a set of golden tasks for an agent, and how you use them before shipping a change.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "agent eval framework",
+    "prompt": "Describe what an agent eval framework does and why it matters for shipping agent changes safely.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "telemetry",
+    "prompt": "Explain what telemetry you would collect for a production agent in 60 seconds, and why each piece is useful.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "cost per task",
+    "prompt": "Walk me through how you would bring down cost per task for an agent, with one concrete example.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "latency per task",
+    "prompt": "Describe how you would measure and reduce latency per task for an agent. What's the main tradeoff?",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "replay a trace",
+    "prompt": "Explain what it means to replay a trace and why it helps you debug without spending more tokens.",
+    "tag": "agent-eval"
+  },
+  {
+    "term": "debug an agent",
+    "prompt": "Walk me through how you debug an agent when it does the wrong thing, with an example of how you pinpointed the failing step.",
+    "tag": "agent-eval"
   }
 ]

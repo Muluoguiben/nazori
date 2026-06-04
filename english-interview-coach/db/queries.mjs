@@ -21,3 +21,9 @@ export const SELECT_REP_TIMES = `SELECT created_at FROM reps ORDER BY created_at
 
 // Lifetime total counted separately so it never undercounts beyond the window above.
 export const SELECT_REP_TOTAL = `SELECT COUNT(*)::int AS n FROM reps`;
+
+// Terms the user has "covered": attempted (a saved rep) or explicitly skipped.
+// UNION (not UNION ALL) de-duplicates across both tables.
+export const SELECT_DONE_TERMS = `SELECT prompt_term FROM reps
+  UNION
+  SELECT prompt_term FROM skipped_concepts`;
