@@ -1,6 +1,6 @@
 # English Interview Coach
 
-A phone-first PWA to practice explaining technical concepts out loud in English for job interviews. Record a 90-second answer; it's transcribed (Whisper) and graded (Claude Sonnet 4.6) with scores, an inline-corrected transcript, and three specific fixes. Solo use.
+A phone-first PWA to practice explaining technical concepts out loud in English for job interviews. Record a 90-second answer; it's transcribed (Whisper) and graded (Claude Sonnet 4.6) with scores, an inline-corrected transcript, and three specific fixes. Also includes `/cards` — tap-to-flip flashcards for the underlying vocabulary (6 weeks × 65 terms). Solo use.
 
 See `spec.md` for the v0 design and `AGENTS.md` for working notes.
 

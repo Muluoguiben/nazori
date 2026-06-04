@@ -19,6 +19,7 @@ A phone-first PWA to practice explaining tech concepts out loud in English, for 
   4. Neon Postgres — `db/schema.sql` (`reps`, `skipped_concepts`), `lib/db.ts`, `/api/skip`, `/api/history`, `scripts/migrate.mjs`.
   5. Shared-secret cookie auth — `middleware.ts`, `/login`, `/api/login` (`APP_SECRET`).
   6. Streak counter — `/api/stats`, shown on the home screen.
+  7. In-app flashcards — `/cards` (tap-to-flip, 6 weeks × 65 terms parsed from `curriculum/`). Adopted post-v0 in place of the original Anki dependency.
 
 Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gracefully (production fails closed without `APP_SECRET`), and `DEMO_MODE=1` runs the full flow with canned data. Verify with `npm run build`, `npm run lint`, `npm run test:unit`, `npm run db:check`, `npm run test:e2e`.
 
@@ -30,7 +31,7 @@ Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gr
 
 ## Design principles (do not violate)
 
-1. **Two-mode split.** This app is Deep mode (speaking) only. Vocab/flashcards live in Anki.
+1. **Two-mode split.** Deep mode (speaking, `/rep`) and Quick mode (flashcards, `/cards`) are intentionally separate screens. Keep them as separate flows — don't fold them into one combined experience.
 2. **Whisper transcript = listener's experience.** Never add a transcript-edit step before evaluation.
 3. **Concise under time pressure.** The 90s hard cap is a feature.
 4. **v0 = explanation reps only.** Mock interview is v1. Do not scope-creep.
@@ -40,7 +41,7 @@ Everything is env-gated: missing keys / `DATABASE_URL` / `APP_SECRET` degrade gr
 - Mid-level engineer (3–5 yr), building agent apps but has not shipped LLM in production
 - Pure-English curriculum content. No Chinese translations in vocab files.
 - Simple English in conversation too — avoid words like "calibration", "hallucination" without a quick gloss
-- Phone is Android. Anki is free on Android.
+- Phone is Android. The in-app `/cards` flashcards replace the previous Anki workflow.
 - Multi-device: phone + Mac + Windows. Needs server-side history (Neon Postgres in the spec).
 
 ## Key file paths
