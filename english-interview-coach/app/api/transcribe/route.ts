@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { audioFilenameFromMime } from '@/lib/audio-format.mjs';
 import { clientKey, rateLimit } from '@/lib/ratelimit';
 
 export const runtime = 'nodejs';
@@ -56,7 +57,13 @@ export async function POST(request: Request) {
   }
 
   const upstream = new FormData();
-  upstream.append('file', audio, 'rep.webm');
+  // Prefer the filename the client attached (it knows its MediaRecorder MIME);
+  // fall back to deriving from audio.type for non-browser callers. Whisper
+  // uses the filename extension to detect format, so iOS audio/mp4 must not
+  // be sent as 'rep.webm'.
+  const filename =
+    audio instanceof File && audio.name ? audio.name : audioFilenameFromMime(audio.type);
+  upstream.append('file', audio, filename);
   upstream.append('model', 'whisper-1');
   upstream.append('language', 'en');
 
