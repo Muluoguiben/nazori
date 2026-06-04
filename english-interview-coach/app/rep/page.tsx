@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { audioFilenameFromMime } from '@/lib/audio-format.mjs';
 import { randomPrompt } from '@/lib/prompts';
 import type { EvalResult, Prompt } from '@/lib/types';
 
@@ -85,7 +86,7 @@ export default function RepPage() {
       setPhase('processing');
       try {
         const fd = new FormData();
-        fd.append('audio', blob, 'rep.webm');
+        fd.append('audio', blob, audioFilenameFromMime(blob.type));
         const tRes = await fetch('/api/transcribe', { method: 'POST', body: fd });
         if (!tRes.ok) {
           const e = await tRes.json().catch(() => ({}));
