@@ -2,7 +2,8 @@
 
 A phone-first PWA to practice explaining technical concepts out loud in English for job interviews. Record a 90-second answer; it's transcribed (Whisper) and graded (Claude Sonnet 4.6) with scores, an inline-corrected transcript, and three specific fixes. Also includes `/cards` — tap-to-flip flashcards for the underlying vocabulary (6 weeks × 65 terms). Solo use.
 
-See `spec.md` for the v0 design and `AGENTS.md` for working notes.
+See `spec.md` for the v0 design, `AGENTS.md` for working notes, and
+`CHANGELOG.md` for what shipped since.
 
 ## Run locally
 
@@ -26,7 +27,8 @@ npm run dev                  # http://localhost:3000
 ## Scripts
 
 - `npm run dev` / `build` / `start` / `lint`
-- `npm run test:unit` — streak math (node:test)
+- `npm run test:unit` — pure-JS helpers under `lib/*.test.mjs` (streak,
+  curriculum parser, audio-format, prompts/scope) via `node --test`
 - `npm run db:check` — schema + queries against in-process Postgres (PGlite)
 - `npm run test:e2e` — Playwright (build + browser)
 - `npm run db:migrate` — apply `db/schema.sql` to `DATABASE_URL`
