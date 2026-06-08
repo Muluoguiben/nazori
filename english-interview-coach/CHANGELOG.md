@@ -7,15 +7,6 @@ file tracks what shipped against it. Format loosely follows
 
 ---
 
-## 2026-06-08 — Deployed to Vercel
-
-The PWA is live on Vercel. Required env: `APP_SECRET`,
-`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL` (Neon). The first deploy
-requires a one-time `npm run db:migrate` against the production `DATABASE_URL`
-to create the `reps` and `skipped_concepts` tables.
-
----
-
 ## 2026-06-05 — Range selector + full 390-prompt curriculum ([#7])
 
 ### Added
