@@ -33,6 +33,7 @@ export interface TranslateResponse {
   translatedText: string;
   detectedLang: LangCode;
   matchedTerms: { source: string; target: string }[];
+  isWordLookup: boolean;
   usage: { inputTokens: number; outputTokens: number };
 }
 

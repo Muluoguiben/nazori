@@ -11,6 +11,100 @@ interface BubbleProps {
 }
 
 const MAX_SOURCE_DISPLAY = 120;
+const MAX_SPEECH_TEXT_LENGTH = 120;
+
+const SPEECH_LANG_TAGS: Record<LangCode, string> = {
+  zh: 'zh-CN',
+  'zh-Hant': 'zh-TW',
+  en: 'en-US',
+  et: 'et-EE',
+  ja: 'ja-JP',
+  ko: 'ko-KR',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  es: 'es-ES',
+  ru: 'ru-RU',
+  pt: 'pt-PT',
+  it: 'it-IT',
+  ar: 'ar-SA',
+};
+
+const PREFERRED_VOICE_NAMES: Partial<Record<LangCode, string[]>> = {
+  zh: ['Tingting', 'Meijia', 'Sin-ji', 'Google 普通话', 'Microsoft Xiaoxiao'],
+  'zh-Hant': ['Meijia', 'Sin-ji', 'Google 國語', 'Microsoft HsiaoChen'],
+  en: ['Google US English', 'Samantha', 'Alex', 'Microsoft Aria', 'Microsoft Jenny'],
+  ja: ['Kyoko', 'Otoya', 'Google 日本語', 'Microsoft Nanami'],
+  ko: ['Yuna', 'Google 한국', 'Microsoft SunHi'],
+  fr: ['Thomas', 'Amelie', 'Audrey', 'Google français', 'Microsoft Denise'],
+  de: ['Anna', 'Markus', 'Google Deutsch', 'Microsoft Katja'],
+  es: ['Monica', 'Jorge', 'Paulina', 'Google español', 'Microsoft Elvira'],
+  ru: ['Milena', 'Google русский', 'Microsoft Svetlana'],
+  pt: ['Luciana', 'Joana', 'Felipe', 'Google português', 'Microsoft Francisca'],
+  it: ['Alice', 'Luca', 'Google italiano', 'Microsoft Elsa'],
+  ar: ['Maged', 'Tarik', 'Google العربية', 'Microsoft Hamed'],
+};
+
+const DISFAVORED_VOICE_NAMES = [
+  'Albert',
+  'Bad News',
+  'Bahh',
+  'Bells',
+  'Boing',
+  'Bubbles',
+  'Cellos',
+  'Deranged',
+  'Fred',
+  'Good News',
+  'Hysterical',
+  'Junior',
+  'Kathy',
+  'Pipe Organ',
+  'Princess',
+  'Ralph',
+  'Trinoids',
+  'Whisper',
+  'Zarvox',
+];
+
+function getSpeechText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim().slice(0, MAX_SPEECH_TEXT_LENGTH);
+}
+
+function voiceNameIncludes(voice: SpeechSynthesisVoice, names: string[]): boolean {
+  const voiceName = voice.name.toLowerCase();
+  return names.some((name) => voiceName.includes(name.toLowerCase()));
+}
+
+function isDisfavoredVoice(voice: SpeechSynthesisVoice): boolean {
+  return voiceNameIncludes(voice, DISFAVORED_VOICE_NAMES);
+}
+
+function chooseSpeechVoice(
+  voices: SpeechSynthesisVoice[],
+  langCode: LangCode,
+  speechLang: string,
+): SpeechSynthesisVoice | undefined {
+  const langPrefix = speechLang.split('-')[0].toLowerCase();
+  const preferredNames = PREFERRED_VOICE_NAMES[langCode] ?? [];
+
+  const scored = voices
+    .filter((voice) => !isDisfavoredVoice(voice))
+    .map((voice) => {
+      const voiceLang = voice.lang.toLowerCase();
+      let score = 0;
+
+      if (voiceNameIncludes(voice, preferredNames)) score += 100;
+      if (voiceLang === speechLang.toLowerCase()) score += 50;
+      if (voiceLang.startsWith(`${langPrefix}-`) || voiceLang === langPrefix) score += 35;
+      if (voice.localService) score += 8;
+      if (voice.default) score += 2;
+
+      return { voice, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return scored.find((item) => item.score >= 35)?.voice ?? scored[0]?.voice;
+}
 
 export default function Bubble({ sourceText, selectionRect, onClose }: BubbleProps) {
   const [translatedText, setTranslatedText] = useState('');
@@ -28,6 +122,9 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
   const [isWordLookup, setIsWordLookup] = useState(false);
   const [fontSize, setFontSize] = useState<Settings['fontSize']>('medium');
   const [showTermHighlight, setShowTermHighlight] = useState(true);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [speechVoices, setSpeechVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Follow-up explain
   const [explainQuestion, setExplainQuestion] = useState('');
@@ -39,6 +136,7 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
   const bubbleRef = useRef<HTMLDivElement>(null);
   const portRef = useRef<chrome.runtime.Port | null>(null);
   const explainPortRef = useRef<chrome.runtime.Port | null>(null);
+  const speechUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const requestIdRef = useRef<string>('');
   const targetLangRef = useRef(targetLang);
   const domainRef = useRef(domain);
@@ -81,6 +179,28 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
     });
   }, []);
 
+  // ---------- Pronunciation playback ----------
+  useEffect(() => {
+    const supported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    setSpeechSupported(supported);
+    if (!supported) return undefined;
+
+    const updateVoices = () => {
+      setSpeechVoices(window.speechSynthesis.getVoices());
+    };
+
+    updateVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', updateVoices);
+
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', updateVoices);
+      if (speechUtteranceRef.current) {
+        window.speechSynthesis.cancel();
+        speechUtteranceRef.current = null;
+      }
+    };
+  }, []);
+
   // ---------- Translation streaming ----------
   const startTranslation = useCallback(() => {
     // Clean up previous port
@@ -96,6 +216,11 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
     setIsStreaming(false);
     setIsRefining(false);
     setIsWordLookup(false);
+    setIsSpeaking(false);
+    if (speechUtteranceRef.current && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      speechUtteranceRef.current = null;
+    }
 
     const port = chrome.runtime.connect({ name: 'translate-stream' });
     portRef.current = port;
@@ -156,7 +281,7 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
           setIsStreaming(false);
           if (payload.matchedTerms) setMatchedTerms(payload.matchedTerms);
           if (payload.detectedLang) setDetectedLang(payload.detectedLang);
-          if (payload.isWordLookup) setIsWordLookup(true);
+          setIsWordLookup(Boolean(payload.isWordLookup));
           break;
         }
         case 'TRANSLATE_ERROR': {
@@ -232,6 +357,80 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
     }
   }, [translatedText]);
 
+  const speechText = getSpeechText(sourceText);
+  const speechLang = detectedLang ? SPEECH_LANG_TAGS[detectedLang] : undefined;
+  const selectedSpeechVoice =
+    detectedLang && speechLang
+      ? chooseSpeechVoice(speechVoices, detectedLang, speechLang)
+      : undefined;
+
+  const handlePronunciation = useCallback(() => {
+    if (!speechSupported || !speechText) return;
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      speechUtteranceRef.current = null;
+      setIsSpeaking(false);
+      return;
+    }
+
+    if (speechUtteranceRef.current) {
+      window.speechSynthesis.cancel();
+    }
+    const utterance = new window.SpeechSynthesisUtterance(speechText);
+    const voices = speechVoices.length > 0 ? speechVoices : window.speechSynthesis.getVoices();
+    const voice =
+      detectedLang && speechLang ? chooseSpeechVoice(voices, detectedLang, speechLang) : undefined;
+    if (voice) utterance.voice = voice;
+    if (voice?.lang) utterance.lang = voice.lang;
+    else if (speechLang) utterance.lang = speechLang;
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+
+    utterance.onend = () => {
+      if (speechUtteranceRef.current === utterance) {
+        speechUtteranceRef.current = null;
+        setIsSpeaking(false);
+      }
+    };
+
+    utterance.onerror = () => {
+      if (speechUtteranceRef.current === utterance) {
+        speechUtteranceRef.current = null;
+        setIsSpeaking(false);
+      }
+    };
+
+    speechUtteranceRef.current = utterance;
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  }, [detectedLang, isSpeaking, speechLang, speechSupported, speechText, speechVoices]);
+
+  const renderPronunciationButton = () => (
+    <button
+      className={`nazori-pronunciation-btn ${
+        isSpeaking ? 'nazori-pronunciation-btn--speaking' : ''
+      }`}
+      type="button"
+      onClick={handlePronunciation}
+      disabled={!speechSupported || !speechText}
+      aria-pressed={isSpeaking}
+      aria-label={
+        isSpeaking ? `Stop pronouncing ${speechText}` : `Play pronunciation for ${speechText}`
+      }
+      title={
+        speechSupported
+          ? `Play pronunciation${selectedSpeechVoice ? ` (${selectedSpeechVoice.name})` : ''}`
+          : 'Speech playback is not available'
+      }
+    >
+      <span className="nazori-pronunciation-icon" aria-hidden="true">
+        {isSpeaking ? '\u25A0' : '\u25B6'}
+      </span>
+      <span>{isSpeaking ? 'Stop' : 'Play'}</span>
+    </button>
+  );
+
   // ---------- Dictionary section renderer ----------
   const renderDictSections = (text: string) => {
     const HEADERS = ['Translation', 'Pronunciation', 'Meaning', 'Usage'];
@@ -257,7 +456,10 @@ export default function Bubble({ sourceText, selectionRect, onClose }: BubblePro
 
     return parts.map((p, i) => (
       <div key={i} className="nazori-dict-section">
-        <div className="nazori-dict-header">{p.header}</div>
+        <div className="nazori-dict-header-row">
+          <div className="nazori-dict-header">{p.header}</div>
+          {p.header === 'Pronunciation' && renderPronunciationButton()}
+        </div>
         <div className="nazori-dict-body">{p.body}</div>
       </div>
     ));
