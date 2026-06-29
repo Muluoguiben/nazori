@@ -142,6 +142,7 @@ export async function translateHandler(c: Context<AppEnv>) {
           modelUsed: 'none',
           detectedLang: preparedState.detectedLang,
           matchedTerms: preparedState.matchedTerms,
+          isWordLookup: preparedState.isWordLookup,
           sameLanguage: true,
           usage: { inputTokens: 0, outputTokens: 0 },
         });
@@ -369,6 +370,7 @@ export async function translateFullHandler(c: Context<AppEnv>) {
       translatedText: data.text,
       detectedLang: prepState.detectedLang,
       matchedTerms: prepState.matchedTerms,
+      isWordLookup: prepState.isWordLookup,
       modelUsed: 'none',
       sameLanguage: true,
       usage: { inputTokens: 0, outputTokens: 0 },
@@ -404,6 +406,7 @@ export async function translateFullHandler(c: Context<AppEnv>) {
     translatedText: finalState.translatedText,
     detectedLang: finalState.detectedLang,
     matchedTerms: finalState.matchedTerms,
+    isWordLookup: finalState.isWordLookup,
     modelUsed: finalState.modelUsed,
     usage: finalState.usage,
   });

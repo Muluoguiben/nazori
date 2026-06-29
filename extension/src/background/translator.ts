@@ -243,6 +243,7 @@ export async function translateStream(
     let fullText = '';
     let detectedLang: LangCode | undefined;
     let usage = { inputTokens: 0, outputTokens: 0 };
+    let isWordLookup = false;
 
     while (true) {
       if (disconnected) {
@@ -295,6 +296,10 @@ export async function translateStream(
             if (parsed.usage !== undefined) {
               usage = parsed.usage as { inputTokens: number; outputTokens: number };
             }
+
+            if (typeof parsed.isWordLookup === 'boolean') {
+              isWordLookup = parsed.isWordLookup;
+            }
           }
 
           if (parsed.type === 'refine_start') {
@@ -328,6 +333,10 @@ export async function translateStream(
             usage = parsed.usage as { inputTokens: number; outputTokens: number };
           }
 
+          if (typeof parsed.isWordLookup === 'boolean') {
+            isWordLookup = parsed.isWordLookup;
+          }
+
           // Some backends send the matched terms back
           if (parsed.matchedTerms !== undefined) {
             matchedTerms = parsed.matchedTerms as { source: string; target: string }[];
@@ -344,6 +353,7 @@ export async function translateStream(
       translatedText: fullText,
       detectedLang: detectedLang ?? (request.sourceLang === 'auto' ? 'en' : request.sourceLang) as LangCode,
       matchedTerms,
+      isWordLookup,
       usage,
     };
 
